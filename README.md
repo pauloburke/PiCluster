@@ -40,7 +40,7 @@ sudo snap install microk8s --classic
 
 1. Enable MicroK8s addons
 ```bash
-sudo microk8s enable dns dashboard helm
+sudo microk8s enable dns dashboard helm hostpath-storage
 ```
 
 2. Check if MicroK8s is running
