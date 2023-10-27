@@ -72,18 +72,25 @@ watch -n 1 microk8s kubectl get all --all-namespaces
 ```
 > If ingress fails to start, reboot the server.
 
-2. Add Ingress rule for dashboard
+9. Add Ingress rule for dashboard
 ```bash
 microk8s kubectl apply -f ingress-kubernetes-dashboard.yaml
 ```
 > This file is in the repo.
 
-3. Get the token to access the dashboard
+10. Get the token to access the dashboard
 ```bash
 microk8s kubectl describe secret -n kube-system microk8s-dashboard-token
 ```
 
-## Unnistalling MicroK8s
+11. (Optional) If calico-node keeps restarting (`Readiness probe failed: calico/node is not ready: felix is not ready: readiness probe reporting 503`), you might have to upgrade the "conmon" package (v1.0.27+):
+```bash
+wget https://launchpad.net/ubuntu/+source/conmon/2.1.6+ds1-1/+build/25582274/+files/conmon_2.1.6+ds1-1_arm64.deb
+sudo dpkg -i conmon_2.1.6+ds1-1_arm64.deb
+rm conmon_2.1.6+ds1-1_arm64.deb
+```
+
+## Unistalling MicroK8s
 
 Run the following command to uninstall MicroK8s:
 ```bash
