@@ -8,7 +8,7 @@ Code and Documentation for setting up a RaspberryPi Cluster
 2. Follow the steps on this [tutorial](https://ubuntu.com/tutorials/how-to-install-ubuntu-on-your-raspberry-pi) to write the image to an SD card.
     > Make sure you edit the install configuration by setting up a hostname, user, and wifi connections if necessary.
 
-> :warning: **The master node must be named "k8-master" for the Kubernetes Dashboard Ingress rule to work. Otherwise, you will have to change the host name in the ingress rule.**
+    > :warning: **The master node must be named "k8-master" for the Kubernetes Dashboard Ingress rule to work. Otherwise, you will have to change the host name in the ingress rule.**
 
 ## Setting up common configurations for Master and Workers
 
