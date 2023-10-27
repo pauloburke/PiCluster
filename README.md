@@ -65,6 +65,7 @@ microk8s enable hostpath-storage
 microk8s enable ingress
 microk8s enable helm
 microk8s enable dashboard
+microk8s enable cert-manager
 ```
 
 8. Wait for pods to be ready
@@ -90,6 +91,12 @@ wget https://launchpad.net/ubuntu/+source/conmon/2.1.6+ds1-1/+build/25582274/+fi
 sudo dpkg -i conmon_2.1.6+ds1-1_arm64.deb
 rm conmon_2.1.6+ds1-1_arm64.deb
 ```
+
+12. Create cluster issuer for cert-manager
+```bash
+microk8s kubectl apply -f cluster-issuer.yml
+```
+> Make sure to change the email address in the file.
 
 ## Unistalling MicroK8s
 
