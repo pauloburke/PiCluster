@@ -9,7 +9,7 @@ spec:
   tls:
   - secretName: tls-secret # NON-EXISTENT
   rules:
-  - host:
+  - host: k8-master
     http:
       paths:
       - path: /
