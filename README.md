@@ -6,7 +6,7 @@ Code and Documentation for setting up a RaspberryPi Cluster
 
 1. Download Ubuntu Server for Raspberry Pi from this [link](https://ubuntu.com/download/raspberry-pi) (Used version 22.04.3 LTS at the time of writing).
 2. Follow the steps on this [tutorial](https://ubuntu.com/tutorials/how-to-install-ubuntu-on-your-raspberry-pi) to write the image to an SD card.
-    > Make sure you edit the install configuration by setting up a hostname, user, and wifi connections if necessary.
+    > Make sure you edit the install configuration by setting up a hostname, user, ssh connection, and wifi connections if necessary.
 
     > :warning: **The master node must be named "k8-master" for the Kubernetes Dashboard Ingress rule to work. Otherwise, you will have to change the host name in the ingress rule.**
 
@@ -74,29 +74,35 @@ watch -n 1 microk8s kubectl get all --all-namespaces
 ```
 > If ingress fails to start, reboot the server.
 
-9. Add Ingress rule for dashboard
+9. Clone this repo
 ```bash
-microk8s kubectl apply -f ingress-kubernetes-dashboard.yaml
+git clone https://github.com/pauloburke/PiCluster.git
+```
+
+10. Add Ingress rule for dashboard
+```bash
+microk8s kubectl apply -f PiCluster/ingress-kubernetes-dashboard.yaml
 ```
 > This file is in the repo.
 
-10. Get the token to access the dashboard
+11. Get the token to access the dashboard
 ```bash
 microk8s kubectl describe secret -n kube-system microk8s-dashboard-token
 ```
 
-11. (Optional) If calico-node keeps restarting (`Readiness probe failed: calico/node is not ready: felix is not ready: readiness probe reporting 503`), you might have to upgrade the "conmon" package (v1.0.27+):
+12. (Optional) If calico-node keeps restarting (`Readiness probe failed: calico/node is not ready: felix is not ready: readiness probe reporting 503`), you might have to upgrade the "conmon" package (v1.0.27+):
 ```bash
 wget https://launchpad.net/ubuntu/+source/conmon/2.1.6+ds1-1/+build/25582274/+files/conmon_2.1.6+ds1-1_arm64.deb
 sudo dpkg -i conmon_2.1.6+ds1-1_arm64.deb
 rm conmon_2.1.6+ds1-1_arm64.deb
 ```
 
-12. Create cluster issuer for cert-manager
+13. Create cluster issuer for cert-manager
 ```bash
-microk8s kubectl apply -f cluster-issuer.yml
+microk8s kubectl apply -f PiCluster/cluster-issuer.yml
 ```
 > Make sure to change the email address in the file.
+<!-- Change to email env variable -->
 
 ## Adding Worker Nodes
 
@@ -120,7 +126,7 @@ sudo vim /etc/hosts
 ```
 Add the following lines:
 ```bash
-<master-ip> <master-hostname>
+<master-ip> k8-master
 <worker-ip> <worker-hostname>
 ```
 
