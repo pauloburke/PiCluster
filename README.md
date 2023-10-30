@@ -98,6 +98,34 @@ microk8s kubectl apply -f cluster-issuer.yml
 ```
 > Make sure to change the email address in the file.
 
+## Adding Worker Nodes
+
+1. On the master node, run the following command to get the join command:
+```bash
+microk8s add-node
+```
+
+2. Add the worker's hostname to the `/etc/hosts` file on the master node:
+```bash
+sudo vim /etc/hosts
+```
+Add the following line:
+```bash
+<worker-ip> <worker-hostname>
+```
+
+3. On the worker node, add the hostname to the `/etc/hosts` file:
+```bash
+sudo vim /etc/hosts
+```
+Add the following lines:
+```bash
+<master-ip> <master-hostname>
+<worker-ip> <worker-hostname>
+```
+
+4. On the worker node, run the join command obtained in step 1.
+
 ## Unistalling MicroK8s
 
 Run the following command to uninstall MicroK8s:
