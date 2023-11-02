@@ -185,7 +185,13 @@ newgrp microk8s
 microk8s status --wait-ready
 ```
 
-4. Enable MicroK8s addons
+4. Enable MicroK8s to start on boot by adding the following line to `/etc/rc.local`:
+```bash
+microk8s start
+```
+> Make sure to add it before the `exit 0` line.
+
+5. Enable MicroK8s addons
 ```bash
 microk8s enable dns 
 microk8s enable ingress
@@ -194,36 +200,36 @@ microk8s enable dashboard
 microk8s enable cert-manager
 ```
 
-5. Wait for pods to be ready
+6. Wait for pods to be ready
 ```bash
 watch -n 1 microk8s kubectl get all --all-namespaces
 ```
 > If ingress fails to start, reboot the server.
 
-6. Clone this repo
+7. Clone this repo
 ```bash
 git clone https://github.com/pauloburke/PiCluster.git
 ```
 
-7. Add Ingress rule for dashboard
+8. Add Ingress rule for dashboard
 ```bash
 microk8s kubectl apply -f PiCluster/ingress-kubernetes-dashboard.yaml
 ```
 > This file is in the repo.
 
-8. Get the token to access the dashboard
+9. Get the token to access the dashboard
 ```bash
 microk8s kubectl describe secret -n kube-system microk8s-dashboard-token
 ```
 
-9. Create cluster issuer for cert-manager
+10. Create cluster issuer for cert-manager
 ```bash
 microk8s kubectl apply -f PiCluster/cluster-issuer.yml
 ```
 > Make sure to change the email address in the file.
 <!-- Change to email env variable -->
 
-14. Create a NFS storage class
+11. Create a NFS storage class
 ```bash
 microk8s helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
 microk8s helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner \
@@ -329,7 +335,13 @@ newgrp microk8s
 microk8s status --wait-ready
 ```
 
-5. On the worker node, run the join command obtained in step 1.
+5. Enable MicroK8s to start on boot by adding the following line to `/etc/rc.local`:
+```bash
+microk8s start
+```
+> Make sure to add it before the `exit 0` line.
+
+6. On the worker node, run the join command obtained in step 1.
 
 ## Unistalling MicroK8s
 
