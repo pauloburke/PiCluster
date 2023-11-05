@@ -5,14 +5,13 @@ metadata:
   namespace: kube-system
   annotations:
     nginx.ingress.kubernetes.io/backend-protocol: HTTPS
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
-  tls:
-  - secretName: tls-secret # NON-EXISTENT
   rules:
   - host: k8-master
     http:
       paths:
-      - path: /
+      - path: /dashboard
         pathType: Prefix
         backend:
           service:
