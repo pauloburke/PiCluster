@@ -215,7 +215,7 @@ git clone https://github.com/pauloburke/PiCluster.git
 ```bash
 microk8s kubectl apply -f PiCluster/ingress-kubernetes-dashboard.yaml
 ```
-> This file is in the repo.
+> The dashboard will be available at `https://k8-master/dashboard/`. Make sure that you added the hostname to your `/etc/hosts` file.
 
 9. Get the token to access the dashboard
 ```bash
