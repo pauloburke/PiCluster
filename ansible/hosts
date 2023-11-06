@@ -1,0 +1,7 @@
+all:
+  vars:
+    ansible_user: burke
+k8_cluster:
+  hosts:
+    k8-1.local:
+    k8-2.local:
