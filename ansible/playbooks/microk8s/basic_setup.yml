@@ -1,0 +1,36 @@
+---
+- hosts: k8_cluster
+  become: yes
+  tasks:
+    - name: Install snapd
+      apt:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - snapd
+
+    - name: Install snapd core
+      command: 
+        cmd: snap install core
+
+    - name: Install MicroK8s
+      command: 
+        cmd: snap install microk8s --classic
+
+    - name: Add user to MicroK8s group
+      block:
+        - user:
+            name: "{{ ansible_user }}"
+            groups: microk8s
+            append: yes
+        - file:
+            path: "~/.kube"
+            owner: "{{ ansible_user }}"
+            recurse: yes
+
+    - name: Enable MicroK8s to start on boot
+      lineinfile:
+        path: /etc/rc.local
+        insertbefore: 'exit 0'
+        line: 'microk8s start'
+...

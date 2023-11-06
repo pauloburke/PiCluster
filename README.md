@@ -2,212 +2,101 @@
 
 Code and Documentation for setting up a RaspberryPi Cluster
 
-## Setting Master
 
-### Installing Raspberry Pi OS
+## Installing Raspberry Pi OS
 
-1. Download the Raspberry Pi Imager from [here](https://www.raspberrypi.org/software/).
-2. Open the Raspberry Pi Imager and select the Raspberry Pi OS Lite (64-bit) option for Operating System.
-3. Select the SD card you want to use and click on "Next".
-4. Edit the configurations setting the hostname to `k8-master`, wifi configuration, and enabling SSH.
+1. Download the Raspberry Pi Imager from [here](https://www.raspberrypi.org/software/) and install it.
+2. Download the Raspberry Pi OS Lite (64-bit) option for Operating System [here](https://www.raspberrypi.com/software/operating-systems/).
+3. Follow the instructions to select the volume (Micro SD card) and image.
+4. Edit the configurations setting the hostname (e.g. k8-1, k8-2...), user and password, and enabling password SSH.
 5. Write the image to the SD card.
 
-### General Setup
+## Setup Ansible
 
+1. Install Ansible
+```bash
+pip3 install ansible
+```
+
+## General Raspberry Pi Setup
+
+The following ansible playbook will setup the Raspberry Pi OS with the following configurations:
 1. Update Raspberry Pi OS
-
-```bash
-sudo apt update && sudo apt dist-upgrade -y
-```
-
-2. Add the following configuration:
-```bash
-sudo vim /boot/firmware/cmdline.txt
-```
-Add the following to the end of the line:
-```bash
-cgroup_enable=memory cgroup_memory=1
-```
-
-3. Install tools
-```bash
-sudo apt install -y vim git curl wget pssh
-```
-
-4. Add the following lines to `/boot/config.txt` to control PoE fan:
-```bash
-# PoE Hat Fan Speeds
-dtparam=poe_fan_temp0=50000
-dtparam=poe_fan_temp1=60000
-dtparam=poe_fan_temp2=70000
-dtparam=poe_fan_temp3=80000
-```
-
+2. Install tools
+3. Add configuration to `/boot/firmware/cmdline.txt`
+4. Add PoE HAT fan configuration to `/boot/config.txt`
 5. Reboot the server
+
 ```bash
-sudo reboot
+ansible-playbook -i hosts playbooks/basic_setup/raspberry_pi_initial_setup.yml
 ```
 
-### Setting up DHCP Server
+## Setting up NFS Server
 
-1. Install DHCP Server
+The following ansible playbook will setup the NFS server with the following configurations:
+
+1. Create a new partition on the SSD
+2. Create a new directory and mount the SSD
+3. Add the volume to `/etc/fstab`
+4. Install NFS Server
+5. Create a mount point for the NFS share (e.g. `/nfs`)
+6. Add the NFS share to `/etc/exports`
+7. Restart the NFS server
+
 ```bash
-sudo apt install -y isc-dhcp-server
+ansible-playbook -i hosts playbooks/basic_setup/nfs_server_setup.yml
+```
+> This playbook assumes that the SSD is available at `/dev/sda`.
+
+## Setting up MicroK8s
+
+The following ansible playbook will setup MicroK8s by executing the following steps:
+
+1. Install snapd
+2. Install snap core
+3. Install MicroK8s
+4. Add user to MicroK8s group
+5. Wait MicroK8s to be ready
+6. Enable MicroK8s to start on boot
+
+```bash
+ansible-playbook -i hosts playbooks/microk8s/basic_setup.yml
 ```
 
-2. Find the MAC address of the master node `eth0` interface:
+## Adding a new node to the cluster
+
+1. Run the following Ansible playbook to add the new node to the `/etc/hosts` file of all master nodes.
+
 ```bash
-ip link show eth0
+ansible-playbook -i hosts playbooks/microk8s/add_node_to_hosts.yml -e "new_node_ip=192.168.0.11 new_node_hostname=k8-1"
+```
+> Replace `new_node_ip` and `new_node_hostname` with the IP address and hostname of the new node.
+
+2. Run the following command to get the join command:
+```bash
+microk8s add-node
 ```
 
-2. Edit the `/etc/dhcp/dhcpd.conf` file by commenting all lines and adding the following lines to the end of the file:
-```bash
-ddns-update-style none;
-authoritative;
-log-facility local7;
+3. SSH into the new node and run the join command obtained in step 2.
 
-# No service will be given on this subnet
-subnet 192.168.1.0 netmask 255.255.255.0 {
-}
+## Setting up the Master Node
 
-# The internal cluster network
-group {
-   option broadcast-address 192.168.50.255;
-   option routers 192.168.50.1;
-   default-lease-time 600;
-   max-lease-time 7200;
-   option domain-name "k8-master";
-   option domain-name-servers 8.8.8.8, 8.8.4.4;
-   subnet 192.168.50.0 netmask 255.255.255.0 {
-      range 192.168.50.20 192.168.50.250;
+SSH into the master node and run the following commands:
 
-      # Head Node
-      host k8-master {
-         hardware ethernet <MAC_ADDRESS>;
-         fixed-address 192.168.50.1;
-      }
-
-   }
-}
-```
-
-3. Edit the `/etc/default/isc-dhcp-server` file:
-```bash
-INTERFACESv4="eth0"
-```
-
-5. Restart the DHCP server:
-```bash
-sudo systemctl restart isc-dhcp-server.service
-```
-
-6. If your is managed, it will be assigned an IP address after a few moments. Check if it shows up in the leases file:
-```bash
-dhcp-lease-list
-```
-
-7. Set an static IP address for the switch by adding the following lines to `/etc/dhcp/dhcpd.conf` after the `k8-master` host:
-```bash
-host switch {
-  hardware ethernet <MAC_ADDRESS>;
-  fixed-address 192.168.50.254;
-}
-```
-
-8. Restart the DHCP server:
-```bash
-sudo systemctl restart isc-dhcp-server.service
-```
-> It will not show up in the leases file anymore once it has a static IP address.
-
-### Setting up NFS Server
-
-Considering that a SSD is plugged into the master node, we will use it to store the data for the cluster.
-
-1. Check the name of the SSD:
-```bash
-sudo fdisk -l
-```
-> In my case, the SSD was named `/dev/sda`.
-
-2. Create a new partition on the SSD:
-```bash
-sudo parted -s /dev/sda mklabel gpt
-sudo parted --a optimal /dev/sda mkpart primary ext4 0% 100%
-sudo mkfs -t ext4 /dev/sda1
-```
-
-3. Create a new directory and mount the SSD:
-```bash
-sudo mkdir /mnt/ssd
-sudo mount /dev/sda1 /mnt/ssd
-```
-
-4. Add the following line to `/etc/fstab`:
-```bash
-/dev/sda1 /mnt/ssd ext4 defaults,user 0 1
-```
-
-5. Install NFS Server:
-```bash
-sudo apt install -y nfs-kernel-server
-```
-
-6. Create a mount point for the NFS share:
-```bash
-sudo mkdir /mnt/ssd/nfs
-sudo chown <user>:<user> /mnt/ssd/nfs
-sudo ln -s /mnt/ssd/nfs /nfs
-```
-
-7. Add the following line to `/etc/exports`:
-```bash
-/nfs 192.168.50.0/24(rw,sync)
-```
-
-8. Restart the NFS server:
-```bash
-sudo systemctl enable rpcbind.service
-sudo systemctl start rpcbind.service
-sudo systemctl enable nfs-server.service
-sudo systemctl start nfs-server.service
-```
-
-### Setting up MicroK8s
-
-1. Install MicroK8s
-```bash
-sudo apt install -y snapd
-sudo snap install core
-sudo snap install microk8s --classic
-```
-
-2. Add user to MicroK8s group
-```bash
-sudo usermod -a -G microk8s $USER
-sudo chown -f -R $USER ~/.kube
-newgrp microk8s
-```
-
-3. Wait MicroK8s to be ready
-```bash
-microk8s status --wait-ready
-```
-
-4. Enable MicroK8s to start on boot by adding the following line to `/etc/rc.local`:
-```bash
-microk8s start
-```
-> Make sure to add it before the `exit 0` line.
-
-5. Enable MicroK8s addons
+1. Enable MicroK8s addons
 ```bash
 microk8s enable dns 
-microk8s enable ingress
 microk8s enable helm
-microk8s enable dashboard
 microk8s enable cert-manager
+microk8s enable dashboard
+microk8s enable ingress
 ```
+
+2. Enable MetalLB
+```bash
+microk8s enable metallb:192.168.0.50-192.168.0.99
+```
+> Make sure that this IP range is not used by your router.
 
 6. Wait for pods to be ready
 ```bash
