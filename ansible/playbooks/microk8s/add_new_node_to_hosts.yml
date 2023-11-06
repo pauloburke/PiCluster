@@ -1,0 +1,12 @@
+---
+- hosts: k8_ha_nodes
+  become: yes
+  vars:
+    new_node_ip: <ip_address>
+    new_node_hostname: <hostname>
+  tasks:
+    - name: Add new node to /etc/hosts
+      lineinfile:
+        path: /etc/hosts
+        line: "{{ new_node_ip }} {{ new_node_hostname }}"
+...

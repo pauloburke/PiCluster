@@ -5,6 +5,13 @@ k8_cluster:
   hosts:
     k8-1.local:
     k8-2.local:
+k8_master:
+  hosts:
+    k8-1.local:
+k8_ha_nodes:
+  hosts:
+    k8-1.local:
+    k8-2.local:
 nfs_servers:
   hosts:
     k8-1.local:
