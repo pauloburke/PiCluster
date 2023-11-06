@@ -34,7 +34,16 @@ cgroup_enable=memory cgroup_memory=1
 sudo apt install -y vim git curl wget pssh
 ```
 
-4. Reboot the server
+4. Add the following lines to `/boot/config.txt` to control PoE fan:
+```bash
+# PoE Hat Fan Speeds
+dtparam=poe_fan_temp0=50000
+dtparam=poe_fan_temp1=60000
+dtparam=poe_fan_temp2=70000
+dtparam=poe_fan_temp3=80000
+```
+
+5. Reboot the server
 ```bash
 sudo reboot
 ```
@@ -285,9 +294,18 @@ sudo apt install -y vim
 sudo sed -i '$s/$/ cgroup_enable=memory cgroup_memory=1/' /boot/firmware/cmdline.txt
 ```
 
-3. On the master node, run `dhcp-lease-list` and find the MAC address of the worker node.
+3. Add the following lines to `/boot/config.txt` to control PoE fan:
+```bash
+# PoE Hat Fan Speeds
+dtparam=poe_fan_temp0=50000
+dtparam=poe_fan_temp1=60000
+dtparam=poe_fan_temp2=70000
+dtparam=poe_fan_temp3=80000
+```
 
-4. On the master node, edit the `/etc/dhcp/dhcpd.conf` file by adding the following lines after the `switch` host`:
+4. On the master node, run `dhcp-lease-list` and find the MAC address of the worker node.
+
+5. On the master node, edit the `/etc/dhcp/dhcpd.conf` file by adding the following lines after the `switch` host`:
 ```bash
 host k8-worker-{N} {
   hardware ethernet <MAC_ADDRESS>;
@@ -297,13 +315,13 @@ host k8-worker-{N} {
 > Replace `{N}` with the number of the worker node and `<MAC_ADDRESS>` with the MAC address of the worker node.
 > This is considering that the worker nods will start with the IP address `192.168.50.10`.
 
-5. Add the following line to `/etc/hosts`:
+6. Add the following line to `/etc/hosts`:
 ```bash
 192.168.50.{9+N} k8-worker-{N}
 ```
 > Replace `{N}` with the number of the worker node and calculate the IP address.
 
-3. Reboot the worker node
+7. Reboot the worker node
 ```bash
 sudo reboot
 ```
