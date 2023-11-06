@@ -1,0 +1,53 @@
+---
+- hosts: nfs_servers
+  become: yes
+  tasks:
+    - name: Create a new partition on the SSD
+      command: 
+        cmd: "{{ item }}"
+      with_items:
+        - parted -s /dev/sda mklabel gpt
+        - parted --a optimal /dev/sda mkpart primary ext4 0% 100%
+        - mkfs -t ext4 /dev/sda1
+
+    - name: Create a new directory and mount the SSD
+      block:
+        - file:
+            path: /mnt/ssd
+            state: directory
+        - mount:
+            path: /mnt/ssd
+            src: /dev/sda1
+            fstype: ext4
+            opts: defaults,user
+            state: mounted
+
+    - name: Install NFS Server
+      apt:
+        name: nfs-kernel-server
+        state: present
+
+    - name: Create a mount point for the NFS share
+      block:
+        - file:
+            path: /mnt/ssd/nfs
+            state: directory
+        - file:
+            path: /nfs
+            src: /mnt/ssd/nfs
+            state: link
+
+    - name: Add the NFS share to /etc/exports
+      lineinfile:
+        path: /etc/exports
+        line: '/nfs 192.168.0.0/24(rw,sync)'
+
+    - name: Restart the NFS server
+      systemd:
+        name: "{{ item }}"
+        state: restarted
+        enabled: yes
+      with_items:
+        - rpcbind.service
+        - nfs-server.service
+...
