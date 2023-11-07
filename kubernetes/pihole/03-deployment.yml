@@ -30,6 +30,10 @@ spec:
               value: '1000'
             - name: PIHOLE_GID
               value: '1000'
+            - name: WEB_UID
+              value: '65534'
+            - name: WEB_GID
+              value: '65534'
           volumeMounts:
             - name: pihole-local-etc-volume
               mountPath: '/etc/pihole'
