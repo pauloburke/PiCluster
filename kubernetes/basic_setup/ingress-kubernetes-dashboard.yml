@@ -9,7 +9,7 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-passthrough: "true"
 spec:
   rules:
-  - host: k8-master
+  - host: "${K8_DASHBOARD_HOST}"
     http:
       paths:
       - path: /

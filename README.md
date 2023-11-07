@@ -104,21 +104,24 @@ watch -n 1 microk8s kubectl get all --all-namespaces
 ```
 > If ingress fails to start, reboot the server.
 
-4. Create cluster issuer for cert-manager
+4. Clone this repo and cd into it
+```bash
+git clone https://github.com/pauloburke/PiCluster.git
+cd PiCluster
+```
+
+5. Create cluster issuer for cert-manager
 ```bash
 export CLUSTER_ISSUER_EMAIL=your-email@example.com
 envsubst < kubernetes/basic_setup/cluster-issuer.yml | microk8s kubectl apply -f -
 ```
-> Make sure to change the email address in the file.
-
-7. Clone this repo
-```bash
-git clone https://github.com/pauloburke/PiCluster.git
-```
+> Make sure to change the email address in the env variable.
 
 8. Add Ingress rule for dashboard
 ```bash
-microk8s kubectl apply -f PiCluster/kubernetes/basic_setup/ingress-kubernetes-dashboard.yaml
+export K8_DASHBOARD_HOST=k8-1
+envsubst < kubernetes/basic_setup/ingress-kubernetes-dashboard.yml | \
+microk8s kubectl apply -f -
 ```
 > The dashboard will be available at `https://k8-1/dashboard/`. Make sure that you added the hostname to your `/etc/hosts` file.
 
@@ -127,13 +130,6 @@ microk8s kubectl apply -f PiCluster/kubernetes/basic_setup/ingress-kubernetes-da
 microk8s kubectl describe secret -n kube-system microk8s-dashboard-token
 ```
 
-10. Create cluster issuer for cert-manager
-```bash
-microk8s kubectl apply -f PiCluster/cluster-issuer.yml
-```
-> Make sure to change the email address in the file.
-<!-- Change to email env variable -->
-
 11. Create a NFS storage class
 ```bash
 microk8s helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
@@ -141,121 +137,6 @@ microk8s helm install nfs-subdir-external-provisioner nfs-subdir-external-provis
     --set nfs.server=192.168.50.1 \
     --set nfs.path=/nfs
 ```
-
-## Adding Worker Nodes
-
-You can use `parallel-ssh` to run commands on multiple nodes at the same time.
-So as a first step, add the worker node to the `~/.pssh_hosts` file:
-```bash
-k8-worker-1
-k8-worker-2
-k8-worker-3
-...
-``` 
-
-Example:
-```bash
-parallel-ssh -h ~/.pssh_hosts -i "sudo apt update && sudo apt dist-upgrade -y"
-```
-
-### Installing Raspberry Pi OS
-
-Assuming that the master node is already setup, we will use the same image to setup the worker nodes.
-However, we will need to change the hostname to `k8-worker-<number>` and provide no wifi configuration.
-It's also recommended to add the SSH key from the master node to the worker nodes.
-
-On the master node, run the following command to get the SSH key:
-```bash
-ssh-keygen
-```
-Get the public key:
-```bash
-cat ~/.ssh/id_rsa.pub
-```
- 
-### General Setup
-
-1. Update Raspberry Pi OS
-```bash
-sudo apt update && sudo apt dist-upgrade -y
-```
-
-2. Install tools
-```bash
-sudo apt install -y vim
-```
-
-2. Edit the `/boot/firmware/cmdline.txt` file to add config to the end of the line:
-```bash
-sudo sed -i '$s/$/ cgroup_enable=memory cgroup_memory=1/' /boot/firmware/cmdline.txt
-```
-
-3. Add the following lines to `/boot/config.txt` to control PoE fan:
-```bash
-# PoE Hat Fan Speeds
-dtparam=poe_fan_temp0=50000
-dtparam=poe_fan_temp1=60000
-dtparam=poe_fan_temp2=70000
-dtparam=poe_fan_temp3=80000
-```
-
-4. On the master node, run `dhcp-lease-list` and find the MAC address of the worker node.
-
-5. On the master node, edit the `/etc/dhcp/dhcpd.conf` file by adding the following lines after the `switch` host`:
-```bash
-host k8-worker-{N} {
-  hardware ethernet <MAC_ADDRESS>;
-  fixed-address 192.168.50.{9+N};
-}
-```
-> Replace `{N}` with the number of the worker node and `<MAC_ADDRESS>` with the MAC address of the worker node.
-> This is considering that the worker nods will start with the IP address `192.168.50.10`.
-
-6. Add the following line to `/etc/hosts`:
-```bash
-192.168.50.{9+N} k8-worker-{N}
-```
-> Replace `{N}` with the number of the worker node and calculate the IP address.
-
-7. Reboot the worker node
-```bash
-sudo reboot
-```
-
-### Setting up Microk8s worker
-
-```bash
-1. On the master node, run the following command to get the join command:
-```bash
-microk8s add-node
-```
-
-2. On the worker node, install MicroK8s
-```bash
-sudo apt install -y snapd
-sudo snap install core
-sudo snap install microk8s --classic
-```
-
-3. Add user to MicroK8s group
-```bash
-sudo usermod -a -G microk8s $USER
-sudo chown -f -R $USER ~/.kube
-newgrp microk8s
-```
-
-4. Wait MicroK8s to be ready
-```bash
-microk8s status --wait-ready
-```
-
-5. Enable MicroK8s to start on boot by adding the following line to `/etc/rc.local`:
-```bash
-microk8s start
-```
-> Make sure to add it before the `exit 0` line.
-
-6. On the worker node, run the join command obtained in step 1.
 
 ## Unistalling MicroK8s
 
