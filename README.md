@@ -33,20 +33,21 @@ ansible-playbook -i hosts playbooks/basic_setup/raspberry_pi_initial_setup.yml
 
 ## Setting up NFS Server
 
+First, have a SSD connected to the Raspberry Pi previously formated with ext4.
+
 The following ansible playbook will setup the NFS server with the following configurations:
 
-1. Create a new partition on the SSD
-2. Create a new directory and mount the SSD
-3. Add the volume to `/etc/fstab`
-4. Install NFS Server
-5. Create a mount point for the NFS share (e.g. `/nfs`)
-6. Add the NFS share to `/etc/exports`
-7. Restart the NFS server
+1. Create a new directory and mount the SSD
+2. Add the volume to `/etc/fstab`
+3. Install NFS Server
+4. Create a mount point for the NFS share (e.g. `/nfs`)
+5. Add the NFS share to `/etc/exports`
+6. Restart the NFS server
 
 ```bash
 ansible-playbook -i hosts playbooks/basic_setup/nfs_server_setup.yml
 ```
-> This playbook assumes that the SSD is available at `/dev/sda`.
+> This playbook assumes that the SSD is available at `/dev/sda1`.
 
 ## Setting up MicroK8s
 
@@ -119,9 +120,7 @@ envsubst < kubernetes/basic_setup/cluster-issuer.yml | microk8s kubectl apply -f
 
 8. Add Ingress rule for dashboard
 ```bash
-export K8_DASHBOARD_HOST=k8-1
-envsubst < kubernetes/basic_setup/ingress-kubernetes-dashboard.yml | \
-microk8s kubectl apply -f -
+microk8s kubectl apply -f kubernetes/basic_setup/ingress-kubernetes-dashboard.yml
 ```
 > The dashboard will be available at `https://k8-1/dashboard/`. Make sure that you added the hostname to your `/etc/hosts` file.
 
@@ -130,13 +129,26 @@ microk8s kubectl apply -f -
 microk8s kubectl describe secret -n kube-system microk8s-dashboard-token
 ```
 
-11. Create a NFS storage class
+## Setting up NFS Client Provisioner
+
+
+
+1. Install CSI Driver for NFS
 ```bash
-microk8s helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
-microk8s helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner \
-    --set nfs.server=192.168.50.1 \
-    --set nfs.path=/nfs
+microk8s helm3 repo add csi-driver-nfs https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/charts
+microk8s helm3 repo update
+microk8s helm3 install csi-driver-nfs csi-driver-nfs/csi-driver-nfs \
+    --namespace kube-system \
+    --set kubeletDir=/var/snap/microk8s/common/var/lib/kubelet
 ```
+
+2. Create the storage class
+```bash
+export NFS_SERVER_IP=192.168.0.11
+envsubst < kubernetes/nfs/storage-class.yml | \
+microk8s kubectl apply -f -
+```
+> Replace `NFS_SERVER_IP` with the IP address of the NFS server.
 
 ## Unistalling MicroK8s
 

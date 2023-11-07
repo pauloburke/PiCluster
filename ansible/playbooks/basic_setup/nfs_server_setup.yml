@@ -2,19 +2,21 @@
 - hosts: nfs_servers
   become: yes
   tasks:
-    - name: Create a new partition on the SSD
-      command: 
-        cmd: "{{ item }}"
-      with_items:
-        - parted -s /dev/sda mklabel gpt
-        - parted --a optimal /dev/sda mkpart primary ext4 0% 100%
-        - mkfs -t ext4 /dev/sda1
+    # - name: Create a new partition on the SSD
+    #   command: 
+    #     cmd: "{{ item }}"
+    #   with_items:
+    #     - parted -s /dev/sda mklabel gpt
+    #     - parted --a optimal /dev/sda mkpart primary ext4 0% 100%
+    #     - mkfs -t ext4 /dev/sda1
 
     - name: Create a new directory and mount the SSD
       block:
         - file:
             path: /mnt/ssd
             state: directory
+            owner: "{{ ansible_user }}"
+            recurse: yes
         - mount:
             path: /mnt/ssd
             src: /dev/sda1
@@ -32,6 +34,8 @@
         - file:
             path: /mnt/ssd/nfs
             state: directory
+            mode: '0755'
+            owner: "{{ ansible_user }}"
         - file:
             path: /nfs
             src: /mnt/ssd/nfs
@@ -41,6 +45,9 @@
       lineinfile:
         path: /etc/exports
         line: '/nfs 192.168.0.0/24(rw,sync)'
+
+    - name: Run exportfs -ra
+      command: sudo exportfs -ra
 
     - name: Restart the NFS server
       systemd:
