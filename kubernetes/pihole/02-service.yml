@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: ingress
-  namespace: pihoile
+  namespace: pihole
 spec:
   selector:
     name: pihole
