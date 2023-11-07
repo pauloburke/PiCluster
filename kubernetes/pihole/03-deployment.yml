@@ -23,7 +23,7 @@ spec:
             - name: TZ
               value: 'America/Denver'
             - name: WEBPASSWORD
-              value: 'admin'
+              value: '${PIHOLE_PASSWORD}'
             - name: TEMPERATUREUNIT
               value: c
             - name: PIHOLE_UID

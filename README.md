@@ -156,7 +156,11 @@ SSH into the master node and run the following commands:
 
 ```bash
 cd ~/PiCluster
-microk8s kubectl apply -f kubernetes/pihole
+microk8s kubectl namespace add pihole
+microk8s kubectl apply -f kubernetes/pihole/01-volume-claim.yml
+microk8s kubectl apply -f kubernetes/pihole/02-service.yml
+export PIHOLE_PASSWORD=your-password
+envsubst < kubernetes/pihole/03-deployment.yml | microk8s kubectl apply -f -
 ```
 
 ## Unistalling MicroK8s
