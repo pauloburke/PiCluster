@@ -9,7 +9,17 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-passthrough: "true"
 spec:
   rules:
-  - host: "${K8_DASHBOARD_HOST}"
+  - host: k8-1
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: kubernetes-dashboard
+            port:
+              number: 443
+  - host: k8-2
     http:
       paths:
       - path: /
