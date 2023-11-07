@@ -107,7 +107,7 @@ watch -n 1 microk8s kubectl get all --all-namespaces
 4. Create cluster issuer for cert-manager
 ```bash
 export CLUSTER_ISSUER_EMAIL=your-email@example.com
-envsubst < cluster-issuer.yml | kubectl apply -f -
+envsubst < kubernetes/basic_setup/cluster-issuer.yml | microk8s kubectl apply -f -
 ```
 > Make sure to change the email address in the file.
 
