@@ -129,9 +129,9 @@ microk8s kubectl apply -f kubernetes/basic_setup/ingress-kubernetes-dashboard.ym
 microk8s kubectl describe secret -n kube-system microk8s-dashboard-token
 ```
 
-## Setting up NFS Client Provisioner
+## Setting up NFS Storage
 
-
+Instructions obtained from [here](https://microk8s.io/docs/nfs).
 
 1. Install CSI Driver for NFS
 ```bash
@@ -149,6 +149,15 @@ envsubst < kubernetes/nfs/storage-class.yml | \
 microk8s kubectl apply -f -
 ```
 > Replace `NFS_SERVER_IP` with the IP address of the NFS server.
+
+## Setting up Pi-hole
+
+SSH into the master node and run the following commands:
+
+```bash
+cd ~/PiCluster
+microk8s kubectl apply -f kubernetes/pihole
+```
 
 ## Unistalling MicroK8s
 
