@@ -98,11 +98,18 @@ microk8s enable metallb:192.168.0.50-192.168.0.99
 ```
 > Make sure that this IP range is not used by your router.
 
-6. Wait for pods to be ready
+3. Wait for pods to be ready
 ```bash
 watch -n 1 microk8s kubectl get all --all-namespaces
 ```
 > If ingress fails to start, reboot the server.
+
+4. Create cluster issuer for cert-manager
+```bash
+export CLUSTER_ISSUER_EMAIL=your-email@example.com
+envsubst < cluster-issuer.yml | kubectl apply -f -
+```
+> Make sure to change the email address in the file.
 
 7. Clone this repo
 ```bash
@@ -111,9 +118,9 @@ git clone https://github.com/pauloburke/PiCluster.git
 
 8. Add Ingress rule for dashboard
 ```bash
-microk8s kubectl apply -f PiCluster/ingress-kubernetes-dashboard.yaml
+microk8s kubectl apply -f PiCluster/kubernetes/basic_setup/ingress-kubernetes-dashboard.yaml
 ```
-> The dashboard will be available at `https://k8-master/dashboard/`. Make sure that you added the hostname to your `/etc/hosts` file.
+> The dashboard will be available at `https://k8-1/dashboard/`. Make sure that you added the hostname to your `/etc/hosts` file.
 
 9. Get the token to access the dashboard
 ```bash
