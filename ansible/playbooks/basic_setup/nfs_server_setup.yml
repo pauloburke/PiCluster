@@ -34,17 +34,22 @@
         - file:
             path: /mnt/ssd/nfs
             state: directory
-            mode: '0755'
-            owner: "{{ ansible_user }}"
-        - file:
-            path: /nfs
-            src: /mnt/ssd/nfs
-            state: link
+
+    - name: Change owner of /mnt/ssd/nfs to nobody:nogroup
+      file:
+        path: /mnt/ssd/nfs
+        owner: nobody
+        group: nogroup
+
+    - name: Change permissions of /mnt/ssd/nfs to 0777
+      file:
+        path: /mnt/ssd/nfs
+        mode: '0777'
 
     - name: Add the NFS share to /etc/exports
       lineinfile:
         path: /etc/exports
-        line: '/nfs 192.168.0.0/24(rw,sync)'
+        line: '/nfs 192.168.0.0/24(rw,sync,no_subtree_check)'
 
     - name: Run exportfs -ra
       command: sudo exportfs -ra

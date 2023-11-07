@@ -6,7 +6,7 @@ metadata:
 provisioner: nfs.csi.k8s.io
 parameters:
   server: ${NFS_SERVER_IP}
-  share: /nfs
+  share: /mnt/ssd/nfs
 reclaimPolicy: Delete
 volumeBindingMode: Immediate
 mountOptions:
