@@ -2,48 +2,48 @@
 - hosts: nfs_servers
   become: yes
   tasks:
-    - name: Create a new partition on the SSD
-      command: 
-        cmd: "{{ item }}"
-      with_items:
-        - parted -s /dev/sda mklabel gpt
-        - parted --a optimal /dev/sda mkpart primary ext4 0% 100%
-        - mkfs -t ext4 /dev/sda1
+    # - name: Create a new partition on the SSD
+    #   command: 
+    #     cmd: "{{ item }}"
+    #   with_items:
+    #     - parted -s /dev/sda mklabel gpt
+    #     - parted --a optimal /dev/sda mkpart primary ext4 0% 100%
+    #     - mkfs -t ext4 /dev/sda1
 
-    - name: Create a new directory and mount the SSD
-      block:
-        - file:
-            path: /mnt/ssd
-            state: directory
-            owner: "{{ ansible_user }}"
-            recurse: yes
-        - mount:
-            path: /mnt/ssd
-            src: /dev/sda1
-            fstype: ext4
-            opts: defaults,user
-            state: mounted
+    # - name: Create a new directory and mount the SSD
+    #   block:
+    #     - file:
+    #         path: /mnt/ssd
+    #         state: directory
+    #         owner: "{{ ansible_user }}"
+    #         recurse: yes
+    #     - mount:
+    #         path: /mnt/ssd
+    #         src: /dev/sda1
+    #         fstype: ext4
+    #         opts: defaults,user
+    #         state: mounted
 
     - name: Install NFS Server
       apt:
         name: nfs-kernel-server
         state: present
-
+    
     - name: Create a mount point for the NFS share
       block:
         - file:
-            path: /mnt/ssd/nfs
+            path: /nfs #/mnt/ssd/nfs for ssd
             state: directory
 
-    - name: Change owner of /mnt/ssd/nfs to nobody:nogroup
+    - name: Change owner of /nfs to nobody:nogroup
       file:
-        path: /mnt/ssd/nfs
+        path: /nfs #/mnt/ssd/nfs for ssd
         owner: nobody
         group: nogroup
 
-    - name: Change permissions of /mnt/ssd/nfs to 0777
+    - name: Change permissions of /nfs to 0777
       file:
-        path: /mnt/ssd/nfs
+        path: /nfs #/mnt/ssd/nfs for ssd
         mode: '0777'
 
     - name: Change RPCMOUNTDOPTS in /etc/default/nfs-kernel-server
@@ -56,7 +56,7 @@
     - name: Add the NFS share to /etc/exports
       lineinfile:
         path: /etc/exports
-        line: '/mnt/ssd/nfs 192.168.0.0/24(rw,sync,no_subtree_check)'
+        line: '/nfs 192.168.0.0/24(rw,sync,no_subtree_check)' #/mnt/ssd/nfs for ssd
 
     - name: Run exportfs -ra
       command: sudo exportfs -ra
