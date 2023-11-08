@@ -2,13 +2,13 @@
 - hosts: nfs_servers
   become: yes
   tasks:
-    # - name: Create a new partition on the SSD
-    #   command: 
-    #     cmd: "{{ item }}"
-    #   with_items:
-    #     - parted -s /dev/sda mklabel gpt
-    #     - parted --a optimal /dev/sda mkpart primary ext4 0% 100%
-    #     - mkfs -t ext4 /dev/sda1
+    - name: Create a new partition on the SSD
+      command: 
+        cmd: "{{ item }}"
+      with_items:
+        - parted -s /dev/sda mklabel gpt
+        - parted --a optimal /dev/sda mkpart primary ext4 0% 100%
+        - mkfs -t ext4 /dev/sda1
 
     - name: Create a new directory and mount the SSD
       block:
@@ -46,10 +46,17 @@
         path: /mnt/ssd/nfs
         mode: '0777'
 
+    - name: Change RPCMOUNTDOPTS in /etc/default/nfs-kernel-server
+      lineinfile:
+        path: /etc/default/nfs-kernel-server
+        regexp: '^RPCMOUNTDOPTS='
+        line: 'RPCMOUNTDOPTS=""'
+        state: present
+
     - name: Add the NFS share to /etc/exports
       lineinfile:
         path: /etc/exports
-        line: '/nfs 192.168.0.0/24(rw,sync,no_subtree_check)'
+        line: '/mnt/ssd/nfs 192.168.0.0/24(rw,sync,no_subtree_check)'
 
     - name: Run exportfs -ra
       command: sudo exportfs -ra

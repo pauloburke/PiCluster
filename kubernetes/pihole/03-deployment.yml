@@ -27,9 +27,9 @@ spec:
             - name: TEMPERATUREUNIT
               value: c
             - name: PIHOLE_UID
-              value: '1000'
+              value: '65534'
             - name: PIHOLE_GID
-              value: '1000'
+              value: '65534'
             - name: WEB_UID
               value: '65534'
             - name: WEB_GID
