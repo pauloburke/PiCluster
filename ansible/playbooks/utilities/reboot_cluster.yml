@@ -1,0 +1,12 @@
+---
+- hosts: k8_cluster
+  become: true
+
+  tasks:
+    - name: Stop microk8s
+      shell: /snap/bin/microk8s stop
+      ignore_errors: yes
+
+    - name: Reboot node
+      reboot:
+...
