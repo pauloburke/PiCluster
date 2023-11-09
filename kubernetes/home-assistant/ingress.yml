@@ -11,8 +11,8 @@ metadata:
 spec:
   tls:
     - hosts:
-        - homeassistant.picluster.local
-        secretName: homeassist-tls
+      - homeassistant.picluster.local
+      secretName: homeassist-tls
   rules:
     - host: home-assistant.picluster.local
       http:
