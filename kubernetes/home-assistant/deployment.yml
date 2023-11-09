@@ -14,13 +14,13 @@ spec:
     metadata:
       labels:
         app: homeassist
-      # annotations:
-      #   k8s.v1.cni.cncf.io/networks: '[
-      #     {
-      #         "name" : "lan-network",
-      #         "interface": "eth1"
-      #     }
-      #   ]'
+      annotations:
+        k8s.v1.cni.cncf.io/networks: '[
+          {
+              "name" : "lan-network",
+              "interface": "eth1"
+          }
+        ]'
     spec:
       containers:
         - name: homeassist
