@@ -3,6 +3,8 @@ kind: Service
 metadata:
   name: homeassist
   namespace: home-assistant
+  annotations:
+    metallb.universe.tf/allow-shared-ip: "homeassist-shared-ip"
 spec:
   type: ClusterIP
   selector:
