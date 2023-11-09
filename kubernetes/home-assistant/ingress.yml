@@ -12,7 +12,7 @@ spec:
   tls:
     - hosts:
         - homeassistant.picluster.local
-        # secretName: homeassist-tls
+        secretName: homeassist-tls
   rules:
     - host: home-assistant.picluster.local
       http:
