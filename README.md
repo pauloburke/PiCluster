@@ -163,6 +163,22 @@ microk8s kubectl apply -f kubernetes/pihole/02-service.yml
 envsubst < kubernetes/pihole/03-deployment.yml | microk8s kubectl apply -f -
 ```
 
+## Setting up Home Assistant
+
+SSH into the master node and run the following commands:
+
+```bash
+cd ~/PiCluster
+export HOMEASSISTANT_BASE64_CONFIG=$(base64 -w 0 kubernetes/home-assistant/configuration.yml)
+microk8s kubectl create namespace home-assistant
+microk8s kubectl apply -f kubernetes/home-assistant/volume-claim.yml
+envsubst < kubernetes/home-assistant/secret.yml | microk8s kubectl apply -f -
+microk8s kubectl apply -f kubernetes/home-assistant/network-attachment.yml
+microk8s kubectl apply -f kubernetes/home-assistant/deployment.yml
+microk8s kubectl apply -f kubernetes/home-assistant/service.yml
+microk8s kubectl apply -f kubernetes/home-assistant/ingress.yml
+```
+
 ## Unistalling MicroK8s
 
 Run the following command to uninstall MicroK8s:
