@@ -165,6 +165,12 @@ envsubst < kubernetes/pihole/03-deployment.yml | microk8s kubectl apply -f -
 
 ## Setting up Home Assistant
 
+First enable the following MicroK8s addons:
+```bash
+microk8s enable community
+microk8s enable multus
+```
+
 SSH into the master node and run the following commands:
 
 ```bash
