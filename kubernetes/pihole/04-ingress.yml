@@ -5,6 +5,7 @@ metadata:
   namespace: pihole
   annotations:
     nginx.ingress.kubernetes.io/rewrite-target: /admin
+    nginx.ingress.kubernetes.io/add-base-url : "true"
 spec:
   rules:
   - host: pihole.picluster.local
