@@ -4,12 +4,10 @@ metadata:
   name: pihole-ingress
   namespace: pihole
   annotations:
-    #nginx.ingress.kubernetes.io/backend-protocol: HTTPS
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    #nginx.ingress.kubernetes.io/ssl-passthrough: "true"
+    nginx.ingress.kubernetes.io/rewrite-target: /admin
 spec:
   rules:
-  - host: pihole.picluster
+  - host: pihole.picluster.local
     http:
       paths:
       - path: /
