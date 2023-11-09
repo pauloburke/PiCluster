@@ -3,15 +3,12 @@ kind: Ingress
 metadata:
   name: pihole-ingress
   namespace: pihole
-  annotations:
-    nginx.ingress.kubernetes.io/use-regex: "true"
-    nginx.ingress.kubernetes.io/rewrite-target: /admin$1
 spec:
   rules:
   - host: pihole.picluster.local
     http:
       paths:
-      - path: /?(.*)
+      - path: /
         pathType: Prefix
         backend:
           service:
