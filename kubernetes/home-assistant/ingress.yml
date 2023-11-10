@@ -4,10 +4,11 @@ metadata:
   name: homeassist-ingress
   namespace: home-assistant
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
-    nginx.ingress.kubernetes.io/configuration-snippet: |
-      proxy_set_header Upgrade $http_upgrade;
-      proxy_set_header Connection "upgrade";
+    cert-manager.io/issuer: "letsencrypt-prod"
+    # nginx.ingress.kubernetes.io/rewrite-target: /
+    # nginx.ingress.kubernetes.io/configuration-snippet: |
+    #   proxy_set_header Upgrade $http_upgrade;
+    #   proxy_set_header Connection "upgrade";
 spec:
   tls:
     - hosts:
