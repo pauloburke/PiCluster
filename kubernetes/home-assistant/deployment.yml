@@ -27,6 +27,12 @@ spec:
           image: homeassistant/home-assistant
           ports:
             - containerPort: 8123
+          securityContext:
+            capabilities:
+              add:
+              - NET_ADMIN
+              - NET_RAW
+              - NET_BROADCAST
           volumeMounts:
             - mountPath: "/config"
               name: homeassist-persistent-storage
