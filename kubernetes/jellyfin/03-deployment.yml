@@ -49,9 +49,9 @@ spec:
         - name: JELLYFIN_PublishedServerUrl 
           value: 192.168.0.53 # The IP number for your jellyfin server (see service config)
         - name: PGID
-          value: "\x31\x30\x30\x30\x30" # < ASCII for 1000
+          value: "\x31\x30\x30\x30" # < ASCII for 1000
         - name: PUID
-          value: "\x31\x30\x30\x30\x30" # < ASCII for 1000
+          value: "\x31\x30\x30\x30" # < ASCII for 1000
         - name: TZ
           value: America/Denver # < Timezone
         securityContext:
