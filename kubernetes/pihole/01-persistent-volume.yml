@@ -9,7 +9,7 @@ spec:
   capacity:
     storage: 1Gi                   # < max. size we reserve for the pv
   accessModes:
-    - ReadWriteMany                # < Multiple pods can write to storage 
+    - ReadWriteOnce                # < Only one pod can mount the pv
   persistentVolumeReclaimPolicy: Retain # < The persistent volume can reclaimed 
   nfs:
     path: /mnt/storage/nfs/pihole/etc       # < Name of your NFS share with subfolder
@@ -26,7 +26,7 @@ spec:
   capacity:
     storage: 1Gi                   # < max. size we reserve for the pv. A bigger value than the configdata
   accessModes:
-    - ReadWriteMany
+    - ReadWriteOnce                # < Only one pod can mount the pv
   persistentVolumeReclaimPolicy: Retain
   nfs:
     path: /mnt/storage/nfs/pihole/dnsmasq.d         
