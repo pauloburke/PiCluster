@@ -4,7 +4,7 @@ metadata:
   name: jellyfin          # < name of ingress entry
   namespace: jellyfin     # < namespace where place the ingress enty
   annotations:
-    kubernetes.io/ingress.class: "nginx"  # < use the nginx ingress controller
+    spec.ingressClassName: "nginx"  # < use the nginx ingress controller
 #    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS" # < communicate in https with the backend (service/pod). With a "#" in front of http will be used.
     cert-manager.io/cluster-issuer: self-signed-cluster-issuer # < use the self-signed-cluster-issuer to create a certificate
 #    nginx.ingress.kubernetes.io/app-root:  # < the root directory here if it's different from the root directory (like /web).
