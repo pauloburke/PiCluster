@@ -33,4 +33,8 @@
         path: /etc/rc.local
         insertbefore: 'exit 0'
         line: 'microk8s start'
+
+    - name: Start MicroK8s
+      command: 
+        cmd: microk8s start
 ...
