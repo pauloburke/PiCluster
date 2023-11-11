@@ -111,20 +111,21 @@ git clone https://github.com/pauloburke/PiCluster.git
 cd PiCluster
 ```
 
-5. Create cluster issuer for cert-manager
+5. Create cluster issuers for cert-manager
 ```bash
 export CLUSTER_ISSUER_EMAIL=your-email@example.com
-envsubst < kubernetes/basic_setup/cluster-issuer.yml | microk8s kubectl apply -f -
+envsubst < kubernetes/basic_setup/letsencrypt-cluster-issuer.yml | microk8s kubectl apply -f -
+microk8s kubectl apply -f kubernetes/basic_setup/self-signed-cluster-issuer.yml
 ```
 > Make sure to change the email address in the env variable.
 
-8. Add Ingress rule for dashboard
+7. Add Ingress rule for dashboard
 ```bash
 microk8s kubectl apply -f kubernetes/basic_setup/ingress-kubernetes-dashboard.yml
 ```
-> The dashboard will be available at `https://k8-1/dashboard/`. Make sure that you added the hostname to your `/etc/hosts` file.
+> The dashboard will be available at `https://k8-1`. Make sure that you added the hostname to your `/etc/hosts` file.
 
-9. Get the token to access the dashboard
+8. Get the token to access the dashboard
 ```bash
 microk8s kubectl describe secret -n kube-system microk8s-dashboard-token
 ```
@@ -155,12 +156,17 @@ microk8s kubectl apply -f -
 SSH into the master node and run the following commands:
 
 ```bash
+mkdir -p /mnt/storage/nfs/pihole/etc
+mkdir -p /mnt/storage/nfs/pihole/dnsmasq.d
+sudo chown -R nobody:nogroup /mnt/storage/nfs/pihole
+sudo chmod -R 777 /mnt/storage/nfs/pihole
 cd ~/PiCluster
 export PIHOLE_PASSWORD=your-password
 microk8s kubectl create namespace pihole
-microk8s kubectl apply -f kubernetes/pihole/01-volume-claim.yml
-microk8s kubectl apply -f kubernetes/pihole/02-service.yml
+microk8s kubectl apply -f kubernetes/pihole/01-persistent-volume.yml
+microk8s kubectl apply -f kubernetes/pihole/02-volume-claim.yml
 envsubst < kubernetes/pihole/03-deployment.yml | microk8s kubectl apply -f -
+microk8s kubectl apply -f kubernetes/pihole/04-service.yml
 ```
 
 ## Setting up Home Assistant
@@ -175,6 +181,9 @@ SSH into the master node and run the following commands:
 
 ```bash
 cd ~/PiCluster
+mkdir -p /mnt/storage/nfs/home-assistant
+sudo chown -R nobody:nogroup /mnt/storage/nfs/home-assistant
+sudo chmod -R 777 /mnt/storage/nfs/home-assistant
 export HOMEASSISTANT_BASE64_CONFIG=$(base64 -w 0 kubernetes/home-assistant/configuration.yml)
 microk8s kubectl create namespace home-assistant
 microk8s kubectl apply -f kubernetes/home-assistant/volume-claim.yml

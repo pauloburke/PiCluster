@@ -5,7 +5,9 @@ metadata:
   namespace: "pihole"
   name: "pihole-etc-pv-claim"
 spec:
-  storageClassName: "nfs-csi"
+  storageClassName: ""
+  volumeName: pihole-pv-nfs-etc
+  volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
   resources:
@@ -18,7 +20,9 @@ metadata:
   namespace: "pihole"
   name: "pihole-dnsmasq-pv-claim"
 spec:
-  storageClassName: "nfs-csi"
+  storageClassName: ""
+  volumeName: pihole-pv-nfs-dnsmasq
+  volumeMode: Filesystem
   accessModes:
     - ReadWriteOnce
   resources:
