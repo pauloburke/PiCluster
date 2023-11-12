@@ -21,6 +21,7 @@
           - git
           - curl
           - wget
+          - ffmpeg
         state: present
 
     - name: Add PoE fan control to config.txt
