@@ -28,6 +28,7 @@ The following hardware is used to build the Pi NAS:
 4. 1x Micro SD Card
 5. 1x Ethernet cable
 6. 1x 12V 5A Power Supply Barrel Jack
+7. 1x 2TB External HDD
 
 ### Additional Hardware
 
@@ -48,6 +49,7 @@ flowchart BT
     NAS(Raspberry Pi 5
     + Radxa Penta SATA HAT
     + 4x 1Tb SSD)
+    HD(2Tb External HDD)
 
     Rp1 --> S
     Rp2 --> S
@@ -55,6 +57,7 @@ flowchart BT
     Rp1 --> N
     N --> R
     NAS --> R
+    HD --> NAS
 ```
 ## Setup Ansible
 
