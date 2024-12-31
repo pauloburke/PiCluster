@@ -33,8 +33,29 @@ The following hardware is used to build the Pi NAS:
 
 1. 1x Router
 
-TODO: Add diagram of the cluster
+```mermaid
+flowchart BT
+    S(PoE Switch)
+    R(Router)
+    Rp1(Raspberry Pi 5
+    + PoE SSD HAT
+    + 1Tb NVMe SSD)
+    Rp2("Raspberry Pi 4 (8Gb)
+    + PoE HAT")
+    Rp3("Raspberry Pi 4 (4Gb)
+    + PoE HAT")
+    N(USB Network Adapter)
+    NAS(Raspberry Pi 5
+    + Radxa Penta SATA HAT
+    + 4x 1Tb SSD)
 
+    Rp1 --> S
+    Rp2 --> S
+    Rp3 --> S
+    Rp1 --> N
+    N --> R
+    NAS --> R
+```
 ## Setup Ansible
 
 We will use Ansible to automate the setup and operation of the cluster. The following steps will guide you through the installation of Ansible. 
