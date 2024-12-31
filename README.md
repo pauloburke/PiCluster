@@ -39,11 +39,20 @@ TODO: Add diagram of the cluster
 
 We will use Ansible to automate the setup and operation of the cluster. The following steps will guide you through the installation of Ansible. 
 
-1. Install Ansible
+1. Install Ansible in your local machine by running the following command:
 ```bash
 pip3 install ansible
 ```
 > Very complex!
 
+## Next Steps
 
+1. [Setup Cluster](./docs/cluster-setup.md)
+2. [Setup Pi NAS](./docs/pi-nas.md)
+3. [Setup Docker Swarm](./docs/docker-swarm-init.md)
+4. Deploy Services:
+    - [Portainer](./docs/services/portainer.md)
+    - [Traefik](./docs/services/traefik.md)
+    - [Pi-hole](./docs/services/pi-hole.md)
+    - [Jellyfin](./docs/services/jellyfin.md)
 
