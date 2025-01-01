@@ -1,8 +1,27 @@
 # PiCluster
 
+1. [Hardware List and Architecture](#hardware-list-and-architecture)
+2. [Setup Ansible](#setup-ansible)
+3. [Nodes and Network Setup](#nodes-and-network-setup)
+    - [Head Node](#head-node)
+    - [First Worker Node](#first-worker-node)
+    - [Additional Worker Nodes](#additional-worker-nodes)
+    - [Pi NAS](#pi-nas)
+4. [Docker Swarm Setup](#docker-swarm-setup)
+    - [Initialize Docker Swarm](#initialize-docker-swarm)
+    - [Add Worker Nodes](#add-worker-nodes)
+    - [Add Pi NAS Storage](#add-pi-nas-storage)
+5. [Deploy Services](#deploy-services)
+    - [Portainer](#portainer)
+    - [Traefik](#traefik)
+    - [Prometheus](#prometheus)
+    - [Grafana](#grafana)
+    - [Pi-hole](#pi-hole)
+    - [Jellyfin](#jellyfin)
+
 Code and Documentation for setting up a RaspberryPi Cluster with Docker Swarm.
 
-## Hardware Architecture
+## Hardware List and Architecture
 
 ### Cluster
 The following hardware is used to build the cluster:
@@ -69,14 +88,65 @@ pip3 install ansible
 ```
 > Very complex!
 
-## Next Steps
+## Nodes and Network Setup
 
-1. [Setup Cluster](./docs/cluster-setup.md)
-2. [Setup Pi NAS](./docs/pi-nas.md)
-3. [Setup Docker Swarm](./docs/docker-swarm-init.md)
-4. Deploy Services:
-    - [Portainer](./docs/services/portainer.md)
-    - [Traefik](./docs/services/traefik.md)
-    - [Pi-hole](./docs/services/pi-hole.md)
-    - [Jellyfin](./docs/services/jellyfin.md)
+Most of this guide was based on the [How to build a Raspberry Pi cluster](https://www.raspberrypi.com/tutorials/cluster-raspberry-pi-tutorial/) article.
+
+### Head Node
+
+We will use a Raspberry Pi 5 as the head node of the cluster as well as the server for network booting the other Raspberry Pis.
+The OS will be installed on the 1TB NVMe SSD.
+
+#### NVMe Boot
+1. Mount the PoE SSD HAT and 1Tb NVMe SSD on the Raspberry Pi 5.
+2. Boot the Raspberry Pi 5 with network cable connected to an internet source.
+3. Format your NVMe drive using Raspberry Pi Imager. You can do this from the Raspberry Pi.
+    - Install the Raspberry Pi OS Lite on the NVMe drive.
+    - Make sure to setup the wifi connection and enable SSH.
+    - Name it `picluster-head`.
+4. In a terminal on the Raspberry Pi, run `sudo raspi-config` to open the Raspberry Pi Configuration CLI.
+5. Under `Advanced Options > Boot Order`, choose `NVMe/USB boot`. Then, exit `raspi-config` with Finish or the Escape key.
+6. Reboot your Raspberry Pi with `sudo reboot`.
+
+For more information, see [NVMe boot](https://www.raspberrypi.com/documentation/computers/raspberry-pi.html#nvme-ssd-boot).
+
+#### Network Configuration
+1. Connect to the Raspberry Pi 5 via SSH.
+2. Connect the USB network adapter to the Raspberry Pi 5.
+3. Run `nmcli` to get the name of the network interface.
+4. Set the onboard ethernet interface to a static IP address by running the following commands:
+```bash
+sudo nmcli con mod "Wired connection 1" ipv4.addresses 192.168.50.1/24 ipv4.method manual
+sudo nmcli con down "Wired connection 1"
+sudo nmcli con up "Wired connection 1"
+```
+
+### First Worker Node
+
+### Additional Worker Nodes
+
+### Pi NAS
+
+## Docker Swarm Setup
+
+### Initialize Docker Swarm
+
+### Add Worker Nodes
+
+### Add Pi NAS Storage
+
+
+## Deploy Services
+
+### Portainer
+
+### Traefik
+
+### Prometheus
+
+### Grafana
+
+### Pi-hole
+
+### Jellyfin
 
