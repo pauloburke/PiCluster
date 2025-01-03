@@ -1,0 +1,20 @@
+services:
+    ansible-semaphore:
+        ports:
+            - 3000:3000
+        image: semaphoreui/semaphore:v2.11.2
+        environment:
+            SEMAPHORE_DB_DIALECT: bolt
+            SEMAPHORE_ADMIN: # USERNAME
+            SEMAPHORE_ADMIN_PASSWORD: # PASSWORD
+            SEMAPHORE_ADMIN_NAME: # NAME
+            SEMAPHORE_ADMIN_EMAIL: # EMAIL
+            SEMAPHORE_ACCESS_KEY_ENCRYPTION: # GENERATE WITH: "head -c32 /dev/urandom | base64"
+        volumes:
+            - semaphore_data:/var/lib/semaphore
+            - semaphore_config:/etc/semaphore
+            - semaphore_tmp:/tmp/semaphore
+volumes:
+    semaphore_data:
+    semaphore_config:
+    semaphore_tmp:

@@ -88,6 +88,9 @@ pip3 install ansible
 ```
 > Very complex!
 
+Or use Semaphore UI to manage Ansible. For that, use the [docker-compose](./docker/ansible-semaphore/docker-compose.yaml) to start the application.
+> Check out their [docs](https://docs.semaphoreui.com/) for more information.
+
 ## Nodes and Network Setup
 
 Most of this guide was based on the [How to build a Raspberry Pi cluster](https://www.raspberrypi.com/tutorials/cluster-raspberry-pi-tutorial/) article.
