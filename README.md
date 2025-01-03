@@ -88,7 +88,7 @@ pip3 install ansible
 ```
 > Very complex!
 
-Or use Semaphore UI to manage Ansible. For that, use the [docker-compose](./docker/ansible-semaphore/docker-compose.yaml) to start the application.
+Or use Semaphore UI to manage Ansible. For that, use the [docker-compose](./docker/ansible-semaphore/docker-compose.yml) to start the application.
 > Check out their [docs](https://docs.semaphoreui.com/) for more information.
 
 ## Nodes and Network Setup
