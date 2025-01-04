@@ -253,8 +253,7 @@ For more information, see [NVMe boot](https://www.raspberrypi.com/documentation/
     ```bash
     sudo apt install iptables
     sudo iptables -t nat -A POSTROUTING -o eth1 -j MASQUERADE
-    sudo iptables -A FORWARD -i wlan0 -o eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT
-    sudo iptables -A FORWARD -i eth0 -o eth1 -j ACCEPT
+    sudo iptables -A FORWARD -i eth0 -o eth0 -m state --state RELATED,ESTABLISHED -j ACCEPT
     sudo sh -c "iptables-save > /etc/iptables.ipv4.nat"
     ```
 
