@@ -232,7 +232,7 @@ For more information, see [NVMe boot](https://www.raspberrypi.com/documentation/
 
 2. Edit the `/etc/default/tftpd-hpa` file and set the following configuration:
     ```bash
-    TFTP_USERNAME="tftp"
+    TFTP_USvcgencmd measure_tempERNAME="tftp"
     TFTP_DIRECTORY="/tftpboot"
     TFTP_ADDRESS=":69"
     TFTP_OPTIONS="--secure --create"
@@ -556,6 +556,8 @@ It will be named `picluster-worker-1`.
 ### Grafana
 
 ### Pi-hole
+
+### Frigate
 
 ### Jellyfin
 
