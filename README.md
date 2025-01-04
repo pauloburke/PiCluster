@@ -205,7 +205,7 @@ For more information, see [NVMe boot](https://www.raspberrypi.com/documentation/
     sudo ln -s /nfs/scratch /scratch
     ```
 
-3. Edit the `/e/mnt/usb/rpi2/etc/hostnametc/exports` file and add the following lines:
+3. Edit the `/etc/exports` file and add the following lines:
     ```bash    
     /nfs/scratch 192.168.50.0/24(rw,sync)
     ```
@@ -287,31 +287,31 @@ It will be named `picluster-worker-1`.
 5. SSH into the Raspberry Pi 4 with the following command:
     ```bash
     ssh pi@<ip_address>
+
+6. Take note of the MAC address and serial number of the Raspberry Pi 4 by running the following command:
+    ```bash
+    ethtool -P eth0
+    grep Serial /proc/cpuinfo | cut -d ' ' -f 2 | cut -c 9-16
     ```
-6. Run the following commands to enable network boot:
+
+   ```
+7. Run the following commands to enable network boot:
     ```bash
     sudo raspi-config
     ```
     - Choose `Advanced Options > Boot Order > Network Boot`.
-    - Exit `raspi-config` with Finish or the Escape key.
-    - Reboot the Raspberry Pi 4 with `sudo reboot`.
+    - Exit `raspi-config` and reboot.
 
-7. If you get an error when trying to enable network boot complaining that "No EEPROM bin file found" then you need to update the firmware on your Raspberry Pi before proceeding. Run the following commands:
+8. If you get an error when trying to enable network boot complaining that "No EEPROM bin file found" then you need to update the firmware on your Raspberry Pi before proceeding. Run the following commands:
     ```bash
     sudo apt install rpi-eeprom
     sudo rpi-eeprom-update -d -a
     sudo reboot
     ```
 
-8. After the Raspberry Pi 4 reboots, use `vcgencmd bootloader_config` to check if the network boot is enabled. The output should be similar to the following:
+9. After the Raspberry Pi 4 reboots, use `vcgencmd bootloader_config` to check if the network boot is enabled. The output should be similar to the following:
     ```bash
     BOOT_ORDER=0xf21
-    ```
-
-9. Take note of the MAC address and serial number of the Raspberry Pi 4 by running the following command:
-    ```bash
-    ethtool -P eth0
-    grep Serial /proc/cpuinfo | cut -d ' ' -f 2 | cut -c 9-16
     ```
 
 10. Shutdown the Raspberry Pi 4 with `sudo shutdown now` and remove the micro SD card.
@@ -343,13 +343,14 @@ It will be named `picluster-worker-1`.
     touch /picluster-nodes/picluster-worker-1/boot/firmware/ssh
     echo pi:$(echo 'raspberry' | openssl passwd -6 -stdin) > /picluster-nodes/picluster-worker-1/boot/firmware/userconf.txt
     sed -i /UUID/d /picluster-nodes/picluster-worker-1/etc/fstab
-    echo "192.168.50.1:/tftpboot/6a5ef8b0 /boot/firmware nfs defaults,vers=3 0 0" >> /picluster-nodes/picluster-worker-1/etc/fstab
+    echo "192.168.50.1:/tftpboot/6a5ef8b0 /boot nfs defaults,vers=4.1,proto=tcp 0 0" >> /picluster-nodes/picluster-worker-1/etc/fstab
     echo "console=serial0,115200 console=tty root=/dev/nfs nfsroot=192.168.50.1:/picluster-nodes/picluster-worker-1,vers=3 rw ip=dhcp rootwait" > /picluster-nodes/picluster-worker-1/boot/firmware/cmdline.txt
     ```
     > Where `6a5ef8b0` is the serial number of the first worker node.
 
 3. Add it to the `/etc/exports` file on the head node:
     ```bash
+    echo "/tftpboot 192.168.50.0/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
     echo "/picluster-nodes/picluster-worker-1 192.168.50.0/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
     ```
 
@@ -366,7 +367,7 @@ It will be named `picluster-worker-1`.
 5. Add node to the DHCP configuration on the head node:
     ```bash
     host picluster-worker-1 {
-         option root-path "/tftpboot/";
+         filename "6a53f8b0/start4.elf"
          hardware ethernet dc:a6:32:6a:16:87;
          option option-43 "Raspberry Pi Boot";
          option option-66 "192.168.50.1";
@@ -375,13 +376,18 @@ It will be named `picluster-worker-1`.
          option host-name "picluster-worker-1";
       }
     ```
-    > Where `dc:a6:32:6a:16:87` is the MAC address of the first worker node.
+    > Where `dc:a6:32:6a:16:87` is the MAC address of the first worker node and `6a53f8b0` is the node's serial number.
 
 6. Reboot the head node with `sudo reboot`.
 
 7. Boot the first worker node and connect to it via SSH:
     ```bash
     ssh pi@192.168.50.11
+    ```
+
+8. Enable SSH on boot by running:
+    ```bash
+    sudo systemctl enable ssh
     ```
 
 9. Run the following commands to avoid error messages during boot:
@@ -498,39 +504,36 @@ It will be named `picluster-worker-1`.
     mkdir -p /tftpboot/6a5ef8b1
     mkdir -p /picluster-nodes/picluster-worker-2
     cp -a /picluster-nodes/picluster-worker-1/* /picluster-nodes/picluster-worker-2
-    echo "/picluster-nodes/picluster-worker-2/boot/firmware /mnt/usb/tftpboot/54e91338 none defaults,bind 0 0" >> /etc/fstab
     echo "/picluster-nodes/picluster-worker-2 192.168.50.0/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
     exit
     ```
     > Where `6a5ef8b1` is the serial number of the second worker node.
 
-2. Edit the `/picluster-nodes/picluster-worker-2/boot/firmware/cmdline.txt`, replacing 'picluster-worker-1' with 'picluster-worker-2':
-    ```bash
-    console=serial0,115200 console=tty root=/dev/nfs nfsroot=192.168.50.1:/picluster-nodes/picluster-worker-2,vers=3 rw ip=dhcp rootwait
-    ```
-
-3. Edit the file `/picluster-nodes/picluster-worker-2/etc/hostname` and change the hostname to `picluster-worker-2`.
+2. Edit the following files, replacing 'picluster-worker-1' with 'picluster-worker-2':
+    - `/tftpboot/6a5ef8b1/cmdline.txt`
+    - `/picluster-nodes/picluster-worker-2/boot/firmware/cmdline.txt`
+    - `/picluster-nodes/picluster-worker-2/etc/fstab`
+    - `/picluster-nodes/picluster-worker-2/etc/hostname`
+    - `/picluster-nodes/picluster-worker-2/etc/hosts`
+    
+    > Where `6a5ef8b1` is the serial number of the second worker node.
 
 4. On the head node, edit the `/etc/dhcp/dhcpd.conf` file and add the following lines:
     ```bash
     host picluster-worker-2 {
-         option root-path "/tftpboot/";
-         hardware ethernet dc:a6:32:6a:16:88;
+         filename "6a53f8b0/start4.elf"
+         hardware ethernet dc:a6:32:6a:16:87;
          option option-43 "Raspberry Pi Boot";
          option option-66 "192.168.50.1";
          next-server 192.168.50.1;
          fixed-address 192.168.50.12;
          option host-name "picluster-worker-2";
-        }
+      }
     ```
-    > Where `dc:a6:32:6a:16:88` is the MAC address of the second worker node.
+    > Where `dc:a6:32:6a:16:88` is the MAC address of the second worker node and `6a53f8b1` is the node's serial number.
 
 5. Reboot the head node with `sudo reboot`.
 
-6. Use `nmap` to check if the second worker node is up and running:
-    ```bash
-    nmap 192.168.50.0/24
-    ```
 
 ### Pi NAS
 
