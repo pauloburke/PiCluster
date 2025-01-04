@@ -538,9 +538,27 @@ It will be named `picluster-worker-1`.
 
 ## Docker Swarm Setup
 
+### Install Docker
+
+On all nodes, run the following commands to install Docker:
+```bash
+curl -sSL https://get.docker.com | sh
+sudo usermod -aG docker pi
+```
+
 ### Initialize Docker Swarm
 
-### Add Worker Nodes
+1. On the head node, run the following command to initialize the Docker Swarm:
+```bash
+docker swarm init --advertise-addr 192.168.50.1
+```
+
+2. Copy the command output and run it on the worker nodes to join the Docker Swarm.
+
+3. Run the following command on the head node to get the list of nodes in the Docker Swarm:
+```bash
+docker node ls
+```
 
 ### Add Pi NAS Storage
 
@@ -548,6 +566,16 @@ It will be named `picluster-worker-1`.
 ## Deploy Services
 
 ### Portainer
+
+To deploy the services, first clone this repository to the head node by running the following command:
+```bash
+git clone git@github.com:pauloburke/PiCluster.git
+```
+
+1. Run the following command to deploy Portainer:
+```bash
+ 
+```
 
 ### Traefik
 
