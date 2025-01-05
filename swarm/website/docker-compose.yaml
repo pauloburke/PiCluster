@@ -2,7 +2,7 @@ version: '3.8'
   
 services:
   personal-website:
-    image: personal-website:latest
+    image: nginx:latest
     ports:
       - 81:80
     deploy:
