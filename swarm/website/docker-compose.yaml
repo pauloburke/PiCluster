@@ -11,6 +11,8 @@ services:
         - "traefik.http.routers.nginx.rule=Host(`paulo.burke-pi.org`)"
         - "traefik.http.routers.nginx.tls=true"
         - "traefik.http.routers.nginx.tls.certresolver=cloudflare"
+        - "traefik.http.routers.pihole.tls.domains[0].main=burke-pi.org"
+        - "traefik.http.routers.pihole.tls.domains[0].sans=*.burke-pi.org"
         - "traefik.http.routers.nginx.entrypoints=websecure"
         - "traefik.http.services.nginx.loadbalancer.server.port=81"
     networks:
