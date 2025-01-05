@@ -4,7 +4,7 @@ services:
   personal-website:
     image: nginx:latest
     ports:
-      - 81:80
+      - 81:81
     deploy:
       labels:
         - "traefik.enable=true"
@@ -20,4 +20,8 @@ services:
 
 networks:
   traefik-public:
+    external: true
+
+configs:
+  personal-website-config:
     external: true
