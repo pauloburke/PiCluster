@@ -24,6 +24,7 @@ services:
       - cloudflare_domain_token
     environment:
       - CF_DNS_API_TOKEN=/run/secrets/cloudflare_domain_token
+      - CF_ZONE_API_TOKEN=/run/secrets/cloudflare_domain_token
     deploy:
       replicas: 1
       restart_policy:
