@@ -13,10 +13,6 @@ services:
         published: 53
         protocol: udp
         mode: host
-      - target: 80
-        published: 80
-        protocol: tcp
-        mode: host
     environment:
       TZ: 'America/Denver'
       WEBPASSWORD: /run/secrets/pihole_password
@@ -37,13 +33,10 @@ services:
       placement:
         constraints:
           - node.role == manager
-      # labels:
-      #   - 'traefik.enable=true'
-      #   - 'traefik.docker.network=traefik-public'
-      #   - 'traefik.http.routers.pihole.rule=Host(`pihole.mydomain.io`)'
-      #   - 'traefik.http.routers.pihole.tls=true'
-      #   - 'traefik.http.routers.pihole.tls.certresolver=myresolver'
-      #   - 'traefik.http.services.pihole-srv.loadbalancer.server.port=80'
+      labels:
+        - 'traefik.enable=true'
+        - 'traefik.http.routers.pihole.rule=Host(`pihole.burke-pi.org`)'
+        - 'traefik.http.routers.pihole.entrypoints=web'
 
 volumes:
   pihole-data:
