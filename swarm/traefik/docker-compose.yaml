@@ -11,12 +11,19 @@ services:
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - type: volume
+        source: traefik-data
+        target: /var/traefik/certs/
     networks:
       - traefik-public
     configs:
       - source: traefik-config
         target: /etc/traefik/traefik.yaml
         mode: 0444
+    secrets:
+      - cloudflare_domain_token
+    environment:
+      - CF_DNS_API_TOKEN=/run/secrets/cloudflare_domain_token
     deploy:
       replicas: 1
       restart_policy:
@@ -29,6 +36,13 @@ configs:
   traefik-config:
     external: true
 
+secrets:
+  cloudflare_domain_token:
+    external: true
+
 networks:
   traefik-public:
     external: true
+
+volumes:
+  traefik-data:
