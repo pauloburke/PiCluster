@@ -1,0 +1,21 @@
+version: '3.8'
+  
+services:
+  nginx:
+    image: nginx:latest
+    ports:
+      - 80:80
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.nginx.rule=Host(`paulo.burke-pi.org`)"
+        - "traefik.http.routers.nginx.tls=true"
+        - "traefik.http.routers.nginx.tls.certresolver=cloudflare"
+        - "traefik.http.routers.nginx.entrypoints=websecure"
+        - "traefik.http.services.nginx.loadbalancer.server.port=80"
+    networks:
+      - traefik-public
+
+networks:
+  traeffik-public:
+    external: true
