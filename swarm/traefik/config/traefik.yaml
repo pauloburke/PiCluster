@@ -6,8 +6,8 @@ log:
 providers:
   docker:
     exposedByDefault: false
-    api:
-      insecure: true
+api:
+  insecure: true
 entryPoints:
   web:
     address: :80
