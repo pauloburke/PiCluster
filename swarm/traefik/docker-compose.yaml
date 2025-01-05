@@ -1,0 +1,21 @@
+---
+
+version: '3.7'
+
+services:
+  traefik:
+    image: traefik:v3.3.0-rc2
+    container_name: traefik
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./config/traefik.yaml:/etc.traefik.traefik.yaml:ro
+    networks:
+      - traefik-net
+    restart: unless-stopped
+
+networks:
+  traefik-net:
+    external: true
