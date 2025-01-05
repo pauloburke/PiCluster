@@ -4,7 +4,7 @@ services:
   nginx:
     image: nginx:latest
     ports:
-      - 80:80
+      - 81:80
     deploy:
       labels:
         - "traefik.enable=true"
@@ -12,7 +12,7 @@ services:
         - "traefik.http.routers.nginx.tls=true"
         - "traefik.http.routers.nginx.tls.certresolver=cloudflare"
         - "traefik.http.routers.nginx.entrypoints=websecure"
-        - "traefik.http.services.nginx.loadbalancer.server.port=80"
+        - "traefik.http.services.nginx.loadbalancer.server.port=81"
     networks:
       - traefik-public
 
