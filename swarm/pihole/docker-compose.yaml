@@ -40,6 +40,8 @@ services:
         - 'traefik.http.routers.pihole.rule=Host(`pihole.burke-pi.org`)'
         - 'traefik.http.routers.pihole.tls.certresolver=cloudflare'
         - 'traefik.http.routers.pihole.tls=true'
+        - "traefik.http.routers.pihole.tls.domains[0].main=burke-pi.org"
+        - "traefik.http.routers.pihole.tls.domains[0].sans=*.burke-pi.org"
         - 'traefik.http.routers.pihole.entrypoints=websecure'
         - "traefik.http.services.pihole.loadbalancer.server.port=80"
 
