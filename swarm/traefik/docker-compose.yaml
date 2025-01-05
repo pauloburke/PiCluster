@@ -11,7 +11,10 @@ services:
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./traefik.yaml:/etc/traefik/traefik.yaml:ro
+    configs:
+      - source: traefik-config
+        target: /etc/traefik/traefik.yaml
+        mode: 0444
     deploy:
       replicas: 1
       restart_policy:
@@ -19,3 +22,8 @@ services:
       placement:
         constraints:
           - node.role == manager
+
+configs:
+  traefik-config:
+    external: true
+    
