@@ -3,8 +3,8 @@ all:
     ansible_user: burke
 k8_cluster:
   hosts:
-    k8-1.local:
-    k8-2.local:
+    k8-1:
+    k8-2:
 k8_master:
   hosts:
     k8-1.local:
@@ -14,4 +14,4 @@ k8_ha_nodes:
     k8-2.local:
 nfs_servers:
   hosts:
-    k8-1.local:
+    k8-1:

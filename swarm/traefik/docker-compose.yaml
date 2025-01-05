@@ -1,16 +1,22 @@
 ---
 
+version: '3'
+
 services:
   traefik:
-    image: traefik:v3.1.5
+    image: traefik:v3.2
     container_name: traefik
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
     ports:
       - "80:80"
       - "443:443"
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./config/traefik.yaml:/etc/traefik/traefik.yaml:ro
     networks:
       - traefik-net
     restart: unless-stopped
