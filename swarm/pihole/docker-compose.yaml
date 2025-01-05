@@ -49,6 +49,6 @@ volume:
   pihole-data:
   pihole-dnsmasq:
 
-secret:
+secrets:
   pihole_password:
     external: true
