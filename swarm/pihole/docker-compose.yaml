@@ -1,0 +1,54 @@
+version: '3.8'
+
+# More info at https://github.com/pi-hole/docker-pi-hole/ and https://docs.pi-hole.net/
+services:
+  pihole:
+    image: pihole/pihole:latest
+    ports:
+      - target: 53
+        published: 53
+        protocol: tcp
+        mode: host
+      - target: 53
+        published: 53
+        protocol: udp
+        mode: host
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+    environment:
+      TZ: 'America/Denver'
+      WEBPASSWORD: /run/secrets/pihole_password
+    secrets:
+      - pihole_password
+    # Volumes store your data between container upgrades
+    volumes:
+      - type: volume
+        source: pihole-data
+        target: /etc/pihole/
+      - type: volume
+        source: pihole-dnsmasq
+        target: /etc/dnsmasq.d/
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: unless-stopped
+      placement:
+        constraints:
+          - node.role == manager
+      # labels:
+      #   - 'traefik.enable=true'
+      #   - 'traefik.docker.network=traefik-public'
+      #   - 'traefik.http.routers.pihole.rule=Host(`pihole.mydomain.io`)'
+      #   - 'traefik.http.routers.pihole.tls=true'
+      #   - 'traefik.http.routers.pihole.tls.certresolver=myresolver'
+      #   - 'traefik.http.services.pihole-srv.loadbalancer.server.port=80'
+
+volume:
+  pihole-data:
+  pihole-dnsmasq:
+
+secret:
+  pihole_password:
+    external: true
