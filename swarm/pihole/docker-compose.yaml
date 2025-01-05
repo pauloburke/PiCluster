@@ -26,6 +26,8 @@ services:
       - type: volume
         source: pihole-dnsmasq
         target: /etc/dnsmasq.d/
+    networks:
+      - traefik-public
     deploy:
       replicas: 1
       restart_policy:
@@ -44,4 +46,8 @@ volumes:
 
 secrets:
   pihole_password:
+    external: true
+
+networks:
+  traefik-public:
     external: true

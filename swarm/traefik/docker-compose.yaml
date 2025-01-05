@@ -11,6 +11,8 @@ services:
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - traefik-public
     configs:
       - source: traefik-config
         target: /etc/traefik/traefik.yaml
@@ -26,4 +28,7 @@ services:
 configs:
   traefik-config:
     external: true
-    
+
+networks:
+  traefik-public:
+    external: true
