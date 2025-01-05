@@ -17,6 +17,10 @@ services:
         - "traefik.http.services.personal-website.loadbalancer.server.port=80"
     networks:
       - traefik-public
+    configs:
+      - source: personal-website-config
+        target: /etc/nginx/conf.d/default.conf
+        mode: 0444
 
 networks:
   traefik-public:
