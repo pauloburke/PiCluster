@@ -29,6 +29,13 @@ services:
       replicas: 1
       placement:
         constraints: [node.role == manager]
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.portainer.rule=Host(`portainer.burke-pi.org`)"
+        - "traefik.http.routers.portainer.tls.certresolver=cloudflare"
+        - "traefik.http.routers.portainer.tls=true"
+        - "traefik.http.routers.portainer.entrypoints=websecure"
+        - "traefik.http.services.portainer.loadbalancer.server.port=9000"
 
 networks:
   agent_network:

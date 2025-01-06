@@ -32,6 +32,13 @@ services:
       placement:
         constraints:
           - node.role == manager
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.traefik.rule=Host(`traefik.burke-pi.org`)"
+        - "traefik.http.routers.traefik.tls.certresolver=cloudflare"
+        - "traefik.http.routers.traefik.tls=true"
+        - "traefik.http.routers.traefik.entrypoints=websecure"
+        - "traefik.http.services.traefik.loadbalancer.server.port=8080"
 
 configs:
   traefik-config:
