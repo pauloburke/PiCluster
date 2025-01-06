@@ -29,7 +29,7 @@ services:
         target: /var/lib/grafana
     environment:
       - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD=/run/secrets/grafana_password
+      - GF_SECURITY_ADMIN_PASSWORD_FILE=/run/secrets/grafana_password
       - GF_USERS_ALLOW_SIGN_UP=false
     networks:
       - monitoring
