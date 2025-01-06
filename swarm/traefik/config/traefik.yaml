@@ -9,6 +9,7 @@ providers:
   swarm:
     endpoint: "unix:///var/run/docker.sock"
     exposedByDefault: false
+    network: traefik-public
 
 api:
   insecure: true
