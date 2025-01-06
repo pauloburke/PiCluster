@@ -11,8 +11,8 @@ services:
         - "traefik.http.routers.personal-website.rule=Host(`paulo.burke-pi.org`)"
         - "traefik.http.routers.personal-website.tls=true"
         - "traefik.http.routers.personal-website.tls.certresolver=cloudflare"
-        - "traefik.http.routers.personal-website.tls.domains[0].main=burke-pi.org"
-        - "traefik.http.routers.personal-website.tls.domains[0].sans=*.burke-pi.org"
+        # - "traefik.http.routers.personal-website.tls.domains[0].main=burke-pi.org"
+        # - "traefik.http.routers.personal-website.tls.domains[0].sans=*.burke-pi.org"
         - "traefik.http.routers.personal-website.entrypoints=websecure"
         - "traefik.http.services.personal-website.loadbalancer.server.port=81"
     networks:
