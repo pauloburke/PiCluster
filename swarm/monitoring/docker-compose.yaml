@@ -33,6 +33,7 @@ services:
       - GF_USERS_ALLOW_SIGN_UP=false
     networks:
       - monitoring
+      - traefik-public
     secrets:
       - grafana_password
 
@@ -64,6 +65,7 @@ services:
         target: /prometheus
     networks:
       - monitoring
+      - traefik-public
 
   cadvisor:
     image: gcr.io/cadvisor/cadvisor:v0.47.0
@@ -136,6 +138,8 @@ volumes:
 networks:
   monitoring:
     driver: overlay
+  traefik-public:
+    external: true
 
 secrets:
   grafana_password:
