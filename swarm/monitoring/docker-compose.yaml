@@ -44,6 +44,9 @@ services:
       - '--log.level=error'
       - '--storage.tsdb.path=/prometheus'
       - '--storage.tsdb.retention.time=7d'
+    configs:
+      - source: prometheus-config
+        target: /etc/prometheus/prometheus.yml
     deploy:
       replicas: 1
       restart_policy:
@@ -145,5 +148,8 @@ secrets:
   grafana_password:
     external: true
 
+configs:
+  prometheus-config:
+    external: true
 
 
