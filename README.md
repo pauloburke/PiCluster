@@ -502,7 +502,7 @@ It will be named `picluster-worker-1`.
     sudo su
     mkdir -p /tftpboot/6a5ef8b1
     mkdir -p /picluster-nodes/picluster-worker-2
-    cp -a /picluster-nodes/picluster-worker-1/* /picluster-nodes/picluster-worker-2
+    rsync -aAXv /picluster/nodes/picluster-worker-1 /picluster/nodes/picluster-worker-2
     echo "/picluster-nodes/picluster-worker-2 192.168.50.0/24(rw,sync,no_subtree_check,no_root_squash)" >> /etc/exports
     exit
     ```
