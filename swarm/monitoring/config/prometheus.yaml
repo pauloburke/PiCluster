@@ -19,6 +19,6 @@ scrape_configs:
     - names:
       - 'tasks.node-exporter'
       type: 'A'
-      port: 9100/etc/prometheus
+      port: 9100
     static_configs:
     - targets: ['192.168.50.5:9100']
