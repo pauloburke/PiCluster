@@ -1,0 +1,28 @@
+version: "3.8"
+services:
+  omv-proxy:
+    image: nginx:alpine
+    networks:
+      - traefik-public
+    configs:
+      - source: omv-proxy-config
+        target: /etc/nginx/conf.d/default.conf
+        mode: 0444
+    ports:
+      - "82:82" # Map external port to Nginx
+    deploy:
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.omv-proxy.rule=Host(`omv.burke-pi.org`)"
+        - 'traefik.http.routers.pihole.tls.certresolver=cloudflare'
+        - 'traefik.http.routers.pihole.tls=true'
+        - 'traefik.http.routers.pihole.entrypoints=websecure'
+        - "traefik.http.services.pihole.loadbalancer.server.port=82"
+
+networks:
+  traefik-public:
+    external: true
+
+configs:
+  omv-proxy-config:
+    external: true
