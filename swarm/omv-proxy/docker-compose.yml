@@ -14,10 +14,10 @@ services:
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.omv-proxy.rule=Host(`omv.burke-pi.org`)"
-        - 'traefik.http.routers.pihole.tls.certresolver=cloudflare'
-        - 'traefik.http.routers.pihole.tls=true'
-        - 'traefik.http.routers.pihole.entrypoints=websecure'
-        - "traefik.http.services.pihole.loadbalancer.server.port=82"
+        - 'traefik.http.routers.omv-proxy.tls.certresolver=cloudflare'
+        - 'traefik.http.routers.omv-proxy.tls=true'
+        - 'traefik.http.routers.omv-proxy.entrypoints=websecure'
+        - "traefik.http.services.omv-proxy.loadbalancer.server.port=82"
 
 networks:
   traefik-public:
