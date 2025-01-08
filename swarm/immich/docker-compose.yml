@@ -6,7 +6,7 @@
 # The compose file on main may not be compatible with the latest release.
 #
 
-name: immich
+version: '3.8'
 
 services:
   immich-server:
