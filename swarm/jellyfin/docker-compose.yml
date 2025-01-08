@@ -14,7 +14,7 @@ services:
         condition: on-failure
       placement:
         constraints:
-          - node.labels.rpi-version == 4
+          - node.labels.rpi-model == 4
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.burke-pi.org`)"
