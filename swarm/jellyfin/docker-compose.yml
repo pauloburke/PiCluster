@@ -1,0 +1,41 @@
+version: "3.8"
+
+services:
+  jellyfin:
+    image: jellyfin/jellyfin
+    env_file: /var/data/config/jellyfin/jellyfin.env
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /scratch/jellyfin/config:/config
+      - /scratch/jellyfin/cache:/cache
+      - nfs-jellyfin-data:/data
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.labels.rpi-version == 4
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.jellyfin.rule=Host(`jellyfin.burke-pi.org`)"
+        - "traefik.http.routers.jellyfin.tls.certresolver=cloudflare"
+        - "traefik.http.routers.jellyfin.tls=true"
+        - "traefik.http.routers.jellyfin.entrypoints=websecure"
+        - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
+    networks:
+        - traefik-public
+    ports:
+      - 8096:8096
+
+networks:
+  traefik-public:
+    external: true
+
+volume:
+  nfs-jellyfin-data:
+    driver: local
+    driver_opts:
+      type: nfs
+      o: addr=192.168.50.5,nolock,soft,rw
+      device: ":/picluster-jellyfin"
