@@ -32,7 +32,7 @@ networks:
   traefik-public:
     external: true
 
-volume:
+volumes:
   nfs-jellyfin-data:
     driver: local
     driver_opts:
