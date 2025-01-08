@@ -3,7 +3,6 @@ version: "3.8"
 services:
   jellyfin:
     image: jellyfin/jellyfin
-    env_file: /var/data/config/jellyfin/jellyfin.env
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /scratch/jellyfin/config:/config
