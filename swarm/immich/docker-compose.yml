@@ -20,6 +20,8 @@ services:
       - /etc/localtime:/etc/localtime:ro
     ports:
       - '2283:2283'
+    networks:
+      - traefik-public
     depends_on:
       - redis
       - database
@@ -92,4 +94,8 @@ volumes:
 
 secrets:
   immich_postgres_password:
+    external: true
+
+networks:
+  traefik-public:
     external: true
