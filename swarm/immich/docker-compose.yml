@@ -85,7 +85,7 @@ services:
 
 volumes:
   model-cache:
-  nas-immich-data:
+  nfs-immich-data:
     driver: local
     driver_opts:
       type: nfs
