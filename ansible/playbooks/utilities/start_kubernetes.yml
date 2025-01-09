@@ -1,8 +1,0 @@
----
-- hosts: k8_cluster
-  become: true
-
-  tasks:
-    - name: Start microk8s
-      shell: /snap/bin/microk8s start
-...

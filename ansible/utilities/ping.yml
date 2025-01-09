@@ -1,0 +1,8 @@
+---
+- name: Test connection to all hosts
+  hosts: all
+  gather_facts: no  # Skip gathering facts to speed up the test
+  tasks:
+    - name: Ping all hosts
+      ansible.builtin.ping:
+
