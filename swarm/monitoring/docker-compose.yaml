@@ -15,7 +15,6 @@ services:
       placement:
         constraints:
           - node.role == manager
-          - node.labels.monitoring == true
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.grafana.rule=Host(`grafana.burke-pi.org`)"
@@ -54,7 +53,6 @@ services:
       placement:
         constraints:
           - node.role == manager
-          - node.labels.monitoring == true
       labels:
         - "traefik.enable=true"
         - "traefik.http.routers.prometheus.rule=Host(`prometheus.burke-pi.org`)"
@@ -104,36 +102,36 @@ services:
     networks:
       - monitoring
 
-  # node-exporter:
-  #   image: prom/node-exporter:v1.5.0
-  #   command:
-  #     - '--path.sysfs=/host/sys'
-  #     - '--path.procfs=/host/proc'
-  #     - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
-  #     - '--no-collector.ipvs'
-  #   deploy:
-  #     mode: global
-  #     resources:
-  #       limits:
-  #         memory: 128M
-  #       reservations:
-  #         memory: 64M
-  #   volumes:
-  #     - type: bind
-  #       source: /
-  #       target: /rootfs
-  #       read_only: true
-  #     - type: bind
-  #       source: /proc
-  #       target: /host/proc
-  #       read_only: true
-  #     - type: bind
-  #       source: /sys
-  #       target: /host/sys
-  #       read_only: true
-  #   networks:
-  #     - monitoring
-  #
+  node-exporter:
+    image: prom/node-exporter:v1.5.0
+    command:
+      - '--path.sysfs=/host/sys'
+      - '--path.procfs=/host/proc'
+      - '--collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)'
+      - '--no-collector.ipvs'
+    deploy:
+      mode: global
+      resources:
+        limits:
+          memory: 128M
+        reservations:
+          memory: 64M
+    volumes:
+      - type: bind
+        source: /
+        target: /rootfs
+        read_only: true
+      - type: bind
+        source: /proc
+        target: /host/proc
+        read_only: true
+      - type: bind
+        source: /sys
+        target: /host/sys
+        read_only: true
+    networks:
+      - monitoring
+
 volumes:
   grafana-data:
   prometheus-data:
