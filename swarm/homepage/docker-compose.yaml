@@ -3,13 +3,14 @@ services:
     image: ghcr.io/gethomepage/homepage:latest
     container_name: homepage
     ports:
-      - 3002:3000
+      - 3002:3002
     volumes:
       - /scratch/homepage-config:/app/config # Make sure your local config directory exists
     user: "1000:1000"
     environment:
       PUID: 1000
       PGID: 1000
+      PORT: 3002
     networks:
       - traefik-public
     deploy:
