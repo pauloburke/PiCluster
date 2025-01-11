@@ -16,12 +16,13 @@ services:
     #   service: cpu # set to one of [nvenc, quicksync, rkmpp, vaapi, vaapi-wsl] for accelerated transcoding
     volumes:
       # Do not edit the next line. If you want to change the media storage location on your system, edit the value of UPLOAD_LOCATION in the .env file
-      - nfs-immich-data:/usr/src/app/upload
+      - /picluster-nas/picluster-immich:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
     ports:
       - '2283:2283'
     networks:
       - traefik-public
+      - immich-private
     depends_on:
       - redis
       - database
@@ -29,6 +30,9 @@ services:
     healthcheck:
       disable: false
     deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
       labels:
         - 'traefik.enable=true'
         - 'traefik.http.routers.immich.rule=Host(`immich.burke-pi.org`)'
@@ -46,26 +50,44 @@ services:
     #   service: cpu # set to one of [armnn, cuda, openvino, openvino-wsl] for accelerated inference - use the `-wsl` version for WSL2 where applicable
     volumes:
       - model-cache:/cache
-    restart: always
+    networks:
+      - immich-private
     healthcheck:
       disable: false
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
 
   redis:
     image: docker.io/redis:6.2-alpine@sha256:eaba718fecd1196d88533de7ba49bf903ad33664a92debb24660a922ecd9cac8
     healthcheck:
       test: redis-cli ping || exit 1
-    restart: always
+    networks:
+      - immich-private
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+
 
   database:
     image: docker.io/tensorchord/pgvecto-rs:pg14-v0.2.0@sha256:90724186f0a3517cf6914295b5ab410db9ce23190a2d9d0b9dd6463e3fa298f0
+
     environment:
       POSTGRES_PASSWORD_FILE: /run/secrets/immich_postgres_password
       POSTGRES_USER: postgres
       POSTGRES_DB: immich
       POSTGRES_INITDB_ARGS: '--data-checksums'
+
     volumes:
       # Do not edit the next line. If you want to change the database storage location on your system, edit the value of DB_DATA_LOCATION in the .env file
-      - /scratch/immich/database:/var/lib/postgresql/data
+      - immich-database:/var/lib/postgresql/data
+    networks:
+      - immich-private
+    secrets:
+      - immich_postgres_password
     healthcheck:
       test: >-
         pg_isready --dbname="$${POSTGRES_DB}" --username="$${POSTGRES_USER}" || exit 1;
@@ -81,16 +103,14 @@ services:
       -c max_wal_size=2GB
       -c shared_buffers=512MB
       -c wal_compression=on
-    restart: always
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
 
 volumes:
   model-cache:
-  nfs-immich-data:
-    driver: local
-    driver_opts:
-      type: nfs
-      o: addr=192.168.50.5,nolock,soft,rw
-      device: ":/picluster-immich"
+  immich-database:
 
 secrets:
   immich_postgres_password:
@@ -99,3 +119,4 @@ secrets:
 networks:
   traefik-public:
     external: true
+  immich-private:
