@@ -6,6 +6,7 @@ services:
       - 3002:3000
     volumes:
       - /scratch/homepage-config:/app/config # Make sure your local config directory exists
+    user: "1000:1000"
     environment:
       PUID: 1000
       PGID: 1000
