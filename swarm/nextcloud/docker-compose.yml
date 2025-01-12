@@ -1,0 +1,100 @@
+services:
+
+  db:
+    image: mariadb:10.11
+    restart: always
+    command: --transaction-isolation=READ-COMMITTED --log-bin=binlog --binlog-format=ROW
+    volumes:
+      - db:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=mysql
+      - MYSQL_PASSWORD=mysql
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.labels.rpi-model == 5
+
+  redis:
+    image: redis:alpine
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.labels.rpi-model == 5
+    
+  app:
+    image: nextcloud:fpm
+    user: 1000:1000
+    depends_on:
+      - redis
+      - db
+    volumes:
+      - nextcloud-nfs:/var/www/html
+    environment:
+      - MYSQL_PASSWORD=mysql
+      - MYSQL_DATABASE=nextcloud
+      - MYSQL_USER=nextcloud
+      - MYSQL_HOST=db
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.labels.rpi-model == 5
+
+  web:
+    image: nginx
+    restart: always
+    ports:
+      - 84:84
+    depends_on:
+      - app
+    configs:
+
+      - source: nextcloud-nginx-web-config
+        target: /etc/nginx/nginx.conf
+        mode: 0444
+    volumes:
+      - nextcloud-nfs:/var/www/html
+    networks:
+      - traefik-public
+      - default
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.labels.rpi-model == 5
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.nextcloud.rule=Host(`nextcloud.burke-pi.org`)"
+        - "traefik.http.routers.nextcloud.tls.certresolver=cloudflare"
+        - "traefik.http.routers.nextcloud.tls=true"
+        - "traefik.http.routers.nextcloud.entrypoints=websecure"
+        - "traefik.http.services.nextcloud.loadbalancer.server.port=84"
+
+
+volumes:
+  nextcloud-nfs:
+    driver_opts:
+      type: "nfs"
+      o: "addr=192.168.50.5,nfsvers=4"
+      device: ":/picluster-nextcloud"
+  db:
+
+configs:
+  nextcloud-nginx-web-config:
+    external: true
+
+networks:
+  traefik-public:
+    external: true
