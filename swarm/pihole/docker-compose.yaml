@@ -13,6 +13,9 @@ services:
         published: 53
         protocol: udp
         mode: host
+    dns:
+      - 127.0.0.1
+      - 8.8.8.8
     environment:
       TZ: 'America/Denver'
       WEBPASSWORD_FILE: /run/secrets/pihole_password
