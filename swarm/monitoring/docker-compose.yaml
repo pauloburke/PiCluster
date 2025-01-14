@@ -136,7 +136,6 @@ services:
         read_only: true
     networks:
       - monitoring
-      - host
 
 volumes:
   grafana-data:
@@ -146,8 +145,6 @@ networks:
   monitoring:
     driver: overlay
   traefik-public:
-    external: true
-  host:
     external: true
 
 secrets:
