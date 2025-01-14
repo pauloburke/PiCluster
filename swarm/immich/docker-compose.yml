@@ -6,18 +6,24 @@
 # The compose file on main may not be compatible with the latest release.
 #
 
-version: '3.8'
-
 services:
   immich-server:
     image: ghcr.io/immich-app/immich-server:${IMMICH_VERSION:-release}
+
     # extends:
     #   file: hwaccel.transcoding.yml
     #   service: cpu # set to one of [nvenc, quicksync, rkmpp, vaapi, vaapi-wsl] for accelerated transcoding
     volumes:
       # Do not edit the next line. If you want to change the media storage location on your system, edit the value of UPLOAD_LOCATION in the .env file
-      - picluster-immich:/usr/src/app/upload
+      - immich-data:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
+    environment:
+      - UPLOAD_LOCATION=immich-data
+      - DB_DATA_LOCATION=immich-database
+      - IMMICH_VERSION=release
+      - DB_PASSWORD=postgres
+      - DB_USERNAME=postgres
+      - DB_DATABASE_NAME=immich
     ports:
       - '2283:2283'
     networks:
@@ -33,6 +39,9 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
+      placement:
+        constraints:
+          - node.labels.rpi-model == 5
       labels:
         - 'traefik.enable=true'
         - 'traefik.http.routers.immich.rule=Host(`immich.burke-pi.org`)'
@@ -45,17 +54,28 @@ services:
     # For hardware acceleration, add one of -[armnn, cuda, openvino] to the image tag.
     # Example tag: ${IMMICH_VERSION:-release}-cuda
     image: ghcr.io/immich-app/immich-machine-learning:${IMMICH_VERSION:-release}
+    user: 1000:1000
     # extends: # uncomment this section for hardware acceleration - see https://immich.app/docs/features/ml-hardware-acceleration
     #   file: hwaccel.ml.yml
     #   service: cpu # set to one of [armnn, cuda, openvino, openvino-wsl] for accelerated inference - use the `-wsl` version for WSL2 where applicable
     volumes:
       - model-cache:/cache
+    environment:
+      - UPLOAD_LOCATION=immich-data
+      - DB_DATA_LOCATION=immich-database
+      - IMMICH_VERSION=release
+      - DB_PASSWORD=postgres
+      - DB_USERNAME=postgres
+      - DB_DATABASE_NAME=immich
     healthcheck:
       disable: false
     deploy:
       replicas: 1
       restart_policy:
         condition: on-failure
+      placement:
+        constraints:
+          - node.labels.rpi-model == 5
 
 
   redis:
@@ -66,22 +86,22 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
+      placement:
+        constraints:
+          - node.labels.rpi-model == 5
 
 
   database:
     image: docker.io/tensorchord/pgvecto-rs:pg14-v0.2.0@sha256:90724186f0a3517cf6914295b5ab410db9ce23190a2d9d0b9dd6463e3fa298f0
 
     environment:
-      POSTGRES_PASSWORD_FILE: /run/secrets/immich_postgres_password
+      POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
       POSTGRES_DB: immich
       POSTGRES_INITDB_ARGS: '--data-checksums'
-
     volumes:
       # Do not edit the next line. If you want to change the database storage location on your system, edit the value of DB_DATA_LOCATION in the .env file
       - immich-database:/var/lib/postgresql/data
-    secrets:
-      - immich_postgres_password
     healthcheck:
       test: >-
         pg_isready --dbname="$${POSTGRES_DB}" --username="$${POSTGRES_USER}" || exit 1;
@@ -101,14 +121,23 @@ services:
       replicas: 1
       restart_policy:
         condition: on-failure
+      placement:
+        constraints:
+          - node.labels.rpi-model == 5
+
 
 volumes:
   model-cache:
   immich-database:
-
-secrets:
-  immich_postgres_password:
-    external: true
+    driver_opts:
+      type: "nfs"
+      o: "addr=192.168.50.5,nfsvers=4"
+      device: ":/picluster-immich/database"
+  immich-data:
+    driver_opts:
+      type: "nfs"
+      o: "addr=192.168.50.5,nfsvers=4"
+      device: ":/picluster-immich/data"
 
 networks:
   traefik-public:
