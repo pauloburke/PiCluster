@@ -16,13 +16,13 @@ services:
     #   service: cpu # set to one of [nvenc, quicksync, rkmpp, vaapi, vaapi-wsl] for accelerated transcoding
     volumes:
       # Do not edit the next line. If you want to change the media storage location on your system, edit the value of UPLOAD_LOCATION in the .env file
-      - /picluster-nas/picluster-immich:/usr/src/app/upload
+      - picluster-immich:/usr/src/app/upload
       - /etc/localtime:/etc/localtime:ro
     ports:
       - '2283:2283'
     networks:
       - traefik-public
-      - immich-private
+      - default
     depends_on:
       - redis
       - database
@@ -50,8 +50,6 @@ services:
     #   service: cpu # set to one of [armnn, cuda, openvino, openvino-wsl] for accelerated inference - use the `-wsl` version for WSL2 where applicable
     volumes:
       - model-cache:/cache
-    networks:
-      - immich-private
     healthcheck:
       disable: false
     deploy:
@@ -64,8 +62,6 @@ services:
     image: docker.io/redis:6.2-alpine@sha256:eaba718fecd1196d88533de7ba49bf903ad33664a92debb24660a922ecd9cac8
     healthcheck:
       test: redis-cli ping || exit 1
-    networks:
-      - immich-private
     deploy:
       replicas: 1
       restart_policy:
@@ -84,8 +80,6 @@ services:
     volumes:
       # Do not edit the next line. If you want to change the database storage location on your system, edit the value of DB_DATA_LOCATION in the .env file
       - immich-database:/var/lib/postgresql/data
-    networks:
-      - immich-private
     secrets:
       - immich_postgres_password
     healthcheck:
@@ -119,4 +113,3 @@ secrets:
 networks:
   traefik-public:
     external: true
-  immich-private:
