@@ -1,4 +1,4 @@
-version: "3.8"
+---
 
 services:
   jellyfin:
@@ -6,9 +6,8 @@ services:
     user: 1000:1000
     volumes:
       - /etc/localtime:/etc/localtime:ro
-      - /scratch/jellyfin/config:/config
-      - /scratch/jellyfin/cache:/cache
-      - /picluster-nas/picluster-jellyfin:/media
+      - jellyfin-config:/config
+      - jellyfin-media:/media
     deploy:
       replicas: 1
       restart_policy:
@@ -27,6 +26,18 @@ services:
         - traefik-public
     ports:
       - 8096:8096
+
+volumes:
+  jellyfin-media:
+    driver_opts:
+      type: "nfs"
+      o: "addr=192.168.50.5,nfsvers=4"
+      device: ":/picluster-jellyfin/media"
+  jellyfin-config:
+    driver_opts:
+      type: "nfs"
+      o: "addr=192.168.50.5,nfsvers=4"
+      device: ":/picluster-jellyfin/config"
 
 networks:
   traefik-public:
