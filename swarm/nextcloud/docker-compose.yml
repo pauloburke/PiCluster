@@ -58,7 +58,6 @@ services:
     depends_on:
       - app
     configs:
-
       - source: nextcloud-nginx-web-config
         target: /etc/nginx/nginx.conf
         mode: 0444
