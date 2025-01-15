@@ -20,16 +20,12 @@ services:
       - "9443:9443"
       - "9000:9000"
       - "8000:8000"
-    dns:
-      - 192.168.50.1
-      - 1.1.1.1     # Cloudflare DNS
     volumes:
       - portainer_data:/data
       - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - agent_network
       - traefik-public
-      - host
     deploy:
       mode: replicated
       replicas: 1
@@ -48,9 +44,6 @@ networks:
     driver: overlay
     attachable: true
   traefik-public:
-    external: true
-  host:
-    name: host
     external: true
 
 volumes:
