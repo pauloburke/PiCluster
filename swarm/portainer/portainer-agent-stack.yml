@@ -29,6 +29,7 @@ services:
     networks:
       - agent_network
       - traefik-public
+      - host
     deploy:
       mode: replicated
       replicas: 1
@@ -47,6 +48,8 @@ networks:
     driver: overlay
     attachable: true
   traefik-public:
+    external: true
+  host:
     external: true
 
 volumes:
