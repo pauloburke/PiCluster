@@ -50,6 +50,7 @@ networks:
   traefik-public:
     external: true
   host:
+    name: host
     external: true
 
 volumes:
