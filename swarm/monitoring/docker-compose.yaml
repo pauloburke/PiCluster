@@ -28,12 +28,12 @@ services:
         target: /var/lib/grafana
     environment:
       - GF_SECURITY_ADMIN_USER=admin
-      - GF_SECURITY_ADMIN_PASSWORD_FILE=/run/secrets/grafana_password
-      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SECURITY_ADMIN_PASSWORD__FILE=/run/secrets/grafana_password
+      - GF_USERS_ALLOW_SIGN_UP=true
       - GF_AUTH_GENERIC_OAUTH_ENABLED="true"
       - GF_AUTH_GENERIC_OAUTH_NAME="authentik"
-      - GF_AUTH_GENERIC_OAUTH_CLIENT_ID_FILE=/run/secrets/grafana_authentik_client_id
-      - GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET_FILE=/run/secrets/grafana_authentik_client_secret
+      - GF_AUTH_GENERIC_OAUTH_CLIENT_ID__FILE=/run/secrets/grafana_authentik_client_id
+      - GF_AUTH_GENERIC_OAUTH_CLIENT_SECRET__FILE=/run/secrets/grafana_authentik_client_secret
       - GF_AUTH_GENERIC_OAUTH_SCOPES="openid profile email"
       - GF_AUTH_GENERIC_OAUTH_AUTH_URL="https://authentik.burke-pi.org/application/o/authorize/"
       - GF_AUTH_GENERIC_OAUTH_TOKEN_URL="https://authentik.burke-pi.org/application/o/token/"
@@ -43,6 +43,7 @@ services:
       - GF_AUTH_OAUTH_AUTO_LOGIN="true"
         # Optionally map user groups to Grafana roles
       - GF_AUTH_GENERIC_OAUTH_ROLE_ATTRIBUTE_PATH="contains(groups, 'Grafana Admins') && 'Admin' || contains(groups, 'Grafana Editors') && 'Editor' || 'Viewer'"
+
     networks:
       - monitoring
       - traefik-public
