@@ -9,17 +9,14 @@ services:
       - "80:80"
       - "443:443"
       - "8080:8080"
+    user: "1000:1000"
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - type: volume
-        source: traefik-data
-        target: /var/traefik/certs/
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /scratch/traefik/traefik.yaml:/etc/traefik/traefik.yaml:ro
+      - /scratch/traefik/certs/:/var/traefik/certs/
+      - /scratch/traefik/conf/:/etc/traefik/conf/
     networks:
       - traefik-public
-    configs:
-      - source: traefik-config
-        target: /etc/traefik/traefik.yaml
-        mode: 0444
     secrets:
       - cloudflare_domain_token
     environment:
