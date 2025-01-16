@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   grafana:
-    image: portainer/template-swarm-monitoring:grafana-9.5.2
+    image: grafana:grafana-11.4.0
     ports:
       - target: 3000
         published: 3000
@@ -81,6 +81,7 @@ services:
         - "traefik.http.routers.prometheus.tls=true"
         - "traefik.http.routers.prometheus.entrypoints=websecure"
         - "traefik.http.services.prometheus.loadbalancer.server.port=9090"
+        - "traefik.http.routers.prometheus.middlewares=authentik@file"
     volumes:
       - type: volume
         source: prometheus-data
