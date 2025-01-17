@@ -1,5 +1,6 @@
 ---
-- name: Update Raspberry Pis
+- name: Update all Raspberry Pis
+  hosts: all
   become: true
   tasks:
     - name: Update the package list
