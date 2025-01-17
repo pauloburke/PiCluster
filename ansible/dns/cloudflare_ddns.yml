@@ -50,7 +50,3 @@
         return_content: yes
       register: result
 
-    - name: Debug response for each domain
-      debug:
-        msg: "Updated DNS for {{ item.name }}: {{ result.content }}"
-
