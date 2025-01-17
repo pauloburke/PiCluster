@@ -1,0 +1,14 @@
+---
+- name: Perform periodic Docker maintenance
+  hosts: all
+  become: true
+  tasks:
+    - name: Remove unused Docker images
+      shell: docker image prune -af
+
+    - name: Remove unused Docker networks
+      shell: docker network prune -f
+
+    - name: Remove unused Docker volumes
+      shell: docker volume prune -f
+
