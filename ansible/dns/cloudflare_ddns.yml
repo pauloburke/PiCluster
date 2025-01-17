@@ -36,15 +36,14 @@
         headers:
           Content-Type: "application/json"
           X-Auth-Key: "{{ cloudflare_api_token }}"
-        body: |
-          {
-            "comment": "Domain verification record",
-            "content": "{{ public_ip.content }}",
-            "name": "{{ domain_name }}",
-            "proxied": true,
-            "ttl": 3600,
-            "type": "A"
-          }
+        body: "{{ {
+          'comment': 'Domain verification record',
+          'content': public_ip.content,
+          'name': domain_name,
+          'proxied': true,
+          'ttl': 3600,
+          'type': 'A'
+        } | to_json }}"
         status_code: 200
         return_content: yes
       register: result
