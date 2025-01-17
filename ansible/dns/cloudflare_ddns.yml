@@ -1,26 +1,55 @@
 ---
-- name: Update Cloudflare Dynamic DNS
+- name: Update Cloudflare DNS Records
   hosts: localhost
   gather_facts: no
 
   vars:
-    zone_id: "{{ lookup('env', 'ZONE_ID') }}"
-    cloudflare_api_token: "{{ lookup('env', 'CLOUDFLARE_API_TOKEN') }}"
+    zone_id: "{{ lookup('env', 'ZONE_ID') }}"                 # Fetch from environment variable
+    cloudflare_api_key: "{{ lookup('env', 'CLOUDFLARE_API_KEY') }}"  # Fetch from environment variable
+    dns_record_ids:                                            # Map of domain names to their DNS record IDs
+      - name: "paulo.burke-pi.org"
+        record_id: "7c55fa297639da10abf21fd20097f24b"
+      - name: "immich.burke-pi.org"
+        record_id: "87433ef8382e2fdd1838ec3cf8c9aaee"
+      - name: "authentik.burke-pi.org"
+        record_id: "801598c07b7890ac76a0c7bd0404b997"
 
   tasks:
-    - name: Update DNS records via Cloudflare API
+    - name: Get public IP address
       uri:
-        url: "https://api.cloudflare.com/client/v4/zones/{{ zone_id }}/dns_records/scan"
-        method: POST
+        url: "https://api.ipify.org?format=text"  # External service to get public IP
+        return_content: yes
+      register: public_ip
+
+    - name: Debug the public IP (for verification)
+      debug:
+        msg: "Public IP: {{ public_ip.content }}"
+
+    - name: Update DNS records via Cloudflare API
+      loop: "{{ dns_record_ids }}"
+      vars:
+        dns_record_id: "{{ item.record_id }}"
+        domain_name: "{{ item.name }}"
+      uri:
+        url: "https://api.cloudflare.com/client/v4/zones/{{ zone_id }}/dns_records/{{ dns_record_id }}"
+        method: PUT
         headers:
           Content-Type: "application/json"
           X-Auth-Key: "{{ cloudflare_api_key }}"
-        body: "{}"
+        body: |
+          {
+            "comment": "Domain verification record",
+            "content": "{{ public_ip.content }}",
+            "name": "{{ domain_name }}",
+            "proxied": true,
+            "ttl": 3600,
+            "type": "A"
+          }
         status_code: 200
         return_content: yes
       register: result
 
-    - name: Debug response from Cloudflare
+    - name: Debug response for each domain
       debug:
-        var: result.content
+        msg: "Updated DNS for {{ item.name }}: {{ result.content }}"
 
