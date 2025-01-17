@@ -5,7 +5,7 @@
 
   vars:
     zone_id: "{{ lookup('env', 'ZONE_ID') }}"                 # Fetch from environment variable
-    cloudflare_api_key: "{{ lookup('env', 'CLOUDFLARE_API_KEY') }}"  # Fetch from environment variable
+    cloudflare_api_token: "{{ lookup('env', 'CLOUDFLARE_API_TOKEN') }}"  # Fetch from environment variable
     dns_record_ids:                                            # Map of domain names to their DNS record IDs
       - name: "paulo.burke-pi.org"
         record_id: "7c55fa297639da10abf21fd20097f24b"
@@ -35,7 +35,7 @@
         method: PUT
         headers:
           Content-Type: "application/json"
-          X-Auth-Key: "{{ cloudflare_api_key }}"
+          X-Auth-Key: "{{ cloudflare_api_token }}"
         body: |
           {
             "comment": "Domain verification record",
