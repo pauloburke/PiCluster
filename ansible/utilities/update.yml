@@ -11,13 +11,3 @@
       apt:
         upgrade: dist
         autoremove: yes
-
-    - name: Check if a reboot is required
-      register: reboot_required
-      stat:
-        path: /var/run/reboot-required
-
-    - name: Reboot the system if required
-      reboot:
-      when: reboot_required.stat.exists
-
