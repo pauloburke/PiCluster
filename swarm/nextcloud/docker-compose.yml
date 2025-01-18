@@ -30,7 +30,7 @@ services:
           - node.labels.rpi-model == 5
     
   app:
-    image: nextcloud:fpm
+    image: nextcloud
     user: 1000:1000
     depends_on:
       - redis
@@ -42,27 +42,6 @@ services:
       - MYSQL_DATABASE=nextcloud
       - MYSQL_USER=nextcloud
       - MYSQL_HOST=db
-    deploy:
-      replicas: 1
-      restart_policy:
-        condition: on-failure
-      placement:
-        constraints:
-          - node.labels.rpi-model == 5
-
-  web:
-    image: nginx
-    restart: always
-    ports:
-      - 84:84
-    depends_on:
-      - app
-    configs:
-      - source: nextcloud-nginx-web-config
-        target: /etc/nginx/nginx.conf
-        mode: 0444
-    volumes:
-      - nextcloud-nfs:/var/www/html
     networks:
       - traefik-public
       - default
@@ -79,7 +58,7 @@ services:
         - "traefik.http.routers.nextcloud.tls.certresolver=cloudflare"
         - "traefik.http.routers.nextcloud.tls=true"
         - "traefik.http.routers.nextcloud.entrypoints=websecure"
-        - "traefik.http.services.nextcloud.loadbalancer.server.port=84"
+        - "traefik.http.services.nextcloud.loadbalancer.server.port=80"
 
 
 volumes:
@@ -89,10 +68,6 @@ volumes:
       o: "addr=192.168.50.5,nfsvers=4"
       device: ":/picluster-nextcloud"
   db:
-
-configs:
-  nextcloud-nginx-web-config:
-    external: true
 
 networks:
   traefik-public:
