@@ -3,7 +3,7 @@ version: '3.8'
 # More info at https://github.com/pi-hole/docker-pi-hole/ and https://docs.pi-hole.net/
 services:
   pihole:
-    image: pihole/pihole:2025.05.1
+    image: pihole/pihole:2024.07.0
     ports:
       - target: 53
         published: 53
